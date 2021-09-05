@@ -1,6 +1,6 @@
 "use strict"
 
-const { ElectEyeDetect } = require('./ElectEyeDetect')
+const { DeviceStateDetect } = require('./DeviceStateDetect')
 
 const { fetchDDE } = require('../util/fetchDDE')
 const { initTraceData } = require('../util/initTraceData')
@@ -16,11 +16,11 @@ class AddWaterMon {
     this.location = location
     this.updateCount = 0
     this.serverName = AddWaterConfig[location]['serverName']
-    // this.electEyeDetect = new ElectEyeDetect(this.location, this.serverName)
+    this.deviceStateDetect = new DeviceStateDetect(this.location, this.serverName, 2)
 
-    // this.serviceList = [
-    //   this.electEyeDetect
-    // ]
+    this.serviceList = [
+      this.deviceStateDetect
+    ]
 
     let traceDataConfig = AddWaterConfig[location]["traceData"]
 
@@ -54,44 +54,17 @@ class AddWaterMon {
 
             this.isWaterBatchChange = true
 
-            // let brandNameTemp = await fetchDDE(this.serverName, 'Galaxy:ZY2_YPSpice_JK.ProductUnit.BrandName_Now', 'string')
-            // this.currentBrandName = brandNameTemp.slice(0, -3)
-            // console.log(`牌号 -> ${this.currentBrandName}.`)
-            
-
-
-            // 检查参数
-            // this.checkPara(AddFlavourConfig[this.location]['para'])
-
-            // 避免每次重启都会执行语音提示加载
-            // if(this.traceDataCol[key].lastValue !== undefined) {
-            //   loadVoiceTips(this.location, key, this.currentBrandName)
-            // }
-
           } else if(key === "除杂批次" && this.traceDataCol[key].currentValue.slice(0, -3) !== "") {
             // 除杂段批次变更
 
             logger.info("除杂批次变更")
 
             this.isCleanUpBatchChange = true
-            // let brandNameTemp = await fetchDDE(this.serverName, 'Galaxy:ZY2_YPSpice_JK.ProductUnit.BrandName_Now', 'string')
-            // this.currentBrandName = brandNameTemp.slice(0, -3)
-            // console.log(`牌号 -> ${this.currentBrandName}.`)
-            
-
-
-            // 检查参数
-            // this.checkPara(AddFlavourConfig[this.location]['para'])
-
-            // 避免每次重启都会执行语音提示加载
-            // if(this.traceDataCol[key].lastValue !== undefined) {
-            //   loadVoiceTips(this.location, key, this.currentBrandName)
-            // }
 
           } else if(key === "电子秤状态") {
             // 筒状态转为生产时 
             // 1.触发语音
-            // 2.监控电眼状态
+            // 2.监控设备状态
 
             // 筒是生产状态的时候(或者秤有流量的时候), 电眼检查开启
             // 当筒是其他状态(或者秤没有流量时), 电眼检查是否可以停掉
@@ -102,22 +75,13 @@ class AddWaterMon {
 
             if(this.traceDataCol[key].currentValue === 2) {
               
-              // if(!this.electEyeDetect.isInit) await this.electEyeDetect.init()
+              if(!this.deviceStateDetect.isInit) await this.deviceStateDetect.init()
 
-              // this.electEyeDetect.isMon = true
-              
-              // 避免每次重启都会执行语音提示加载
-              // if(this.traceDataCol[key].lastValue !== undefined) {
-              //   this.voiceTipsTimeId = loadVoiceTips(this.location, key, this.currentBrandName)
-              // }
+              this.deviceStateDetect.isMon = true
 
             } else if(this.traceDataCol[key].currentValue === 0) {
               
-              // this.electEyeDetect.isMon = false
-
-              // if(this.traceDataCol[key].lastValue !== undefined) {
-              //   this.voiceTipsTimeId.forEach(timeId => clearTimeout(timeId))
-              // }
+              this.deviceStateDetect.isMon = false
 
             }
           }
@@ -128,9 +92,9 @@ class AddWaterMon {
         logger.error(err)
 
         if (err.message === "Not connected") {
-          await this.electEyeDetect.reset()
+          // await this.electEyeDetect.reset()
 
-          logger.info('reset electEyeDetect')
+          // logger.info('reset electEyeDetect')
         }
       }
     }
@@ -140,6 +104,11 @@ class AddWaterMon {
       this.isWaterBatchChange = false
       this.isCleanUpBatchChange = false
     }
+
+    // let motorState = await fetchDDE(this.serverName, "Galaxy:ZY2KT.Topic_ZS6.FT_DP1_M1_STATE", "int")
+    // let electEyeState = await fetchDDE(this.serverName, "Galaxy:ZY2KT.Topic_ZS6.FT_DP5_B1_1", "int")
+    // logger.info(`电机状态：${motorState}`)
+    // logger.info(`电眼状态：${electEyeState}`)
   }
 
   async updateService() {
@@ -156,7 +125,7 @@ class AddWaterMon {
   async updateAll() {
     this.recordUpdateCount()
     await this.updateTraceData()
-    // await this.updateService()
+    await this.updateService()
   }
 
   recordUpdateCount() {
@@ -166,15 +135,15 @@ class AddWaterMon {
 
   async checkPara(paraConfig) {
     
-    let resultList = await Promise.all([
-      checkMoistureMeter(this.location, this.serverName, paraConfig['MoistureMeter'])
-    ])
+  //   let resultList = await Promise.all([
+  //     checkMoistureMeter(this.location, this.serverName, paraConfig['MoistureMeter'])
+  //   ])
 
-    let finalResult = resultList.reduce((prev, curr) => prev && curr, true)
+  //   let finalResult = resultList.reduce((prev, curr) => prev && curr, true)
     
-    if(finalResult) {
-      logger.info(`${this.location} 参数检查完毕, 没有发现错误`)
-    }
+  //   if(finalResult) {
+  //     logger.info(`${this.location} 参数检查完毕, 没有发现错误`)
+  //   }
   }
 }
 

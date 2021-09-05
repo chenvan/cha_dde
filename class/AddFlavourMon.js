@@ -1,7 +1,7 @@
 "use strict"
 
 const { CabinetOutput } = require('./CabinetOutput')
-const { ElectEyeDetect } = require('./ElectEyeDetect')
+const { DeviceStateDetect } = require('./DeviceStateDetect')
 
 const { fetchDDE } = require('../util/fetchDDE')
 const { initTraceData } = require('../util/initTraceData')
@@ -18,11 +18,11 @@ class AddFlavourMon {
     this.updateCount = 0
     this.serverName = AddFlavourConfig[location]['serverName']
     this.cabinetOutput = new CabinetOutput(this.location, this.serverName)
-    this.electEyeDetect = new ElectEyeDetect(this.location, this.serverName)
+    this.deviceStateDetect = new DeviceStateDetect(this.location, this.serverName, 2)
 
     this.serviceList = [
       this.cabinetOutput,
-      this.electEyeDetect
+      this.deviceStateDetect
     ]
 
     let traceDataConfig = AddFlavourConfig[location]["traceData"]
@@ -62,7 +62,7 @@ class AddFlavourMon {
             // 检查参数
             this.checkPara(AddFlavourConfig[this.location]['para'])
 
-            // 避免每次重启都会执行语音提示加载
+            // 避免每次重启都会执行语音提示加载            
             if(this.traceDataCol[key].lastValue !== undefined) {
               loadVoiceTips(this.location, key, this.currentBrandName)
             }
@@ -78,9 +78,9 @@ class AddFlavourMon {
             // 或者我们都用 settimeout的方式, 延长10s设置 isMon
             if(this.traceDataCol[key].currentValue === 2) {
               
-              if(!this.electEyeDetect.isInit) await this.electEyeDetect.init()
+              if(!this.deviceStateDetect.isInit) await this.deviceStateDetect.init()
 
-              this.electEyeDetect.isMon = true
+              this.deviceStateDetect.isMon = true
               
               // 避免每次重启都会执行语音提示加载
               if(this.traceDataCol[key].lastValue !== undefined) {
@@ -89,7 +89,7 @@ class AddFlavourMon {
 
             } else if(this.traceDataCol[key].currentValue === 0) {
               
-              this.electEyeDetect.isMon = false
+              this.deviceStateDetect.isMon = false
 
               if(this.traceDataCol[key].lastValue !== undefined) {
                 this.voiceTipsTimeId.forEach(timeId => clearTimeout(timeId))
@@ -104,9 +104,9 @@ class AddFlavourMon {
         logger.error(err)
 
         if (err.message === "Not connected") {
-          await this.electEyeDetect.reset()
+          await this.deviceStateDetect.reset()
 
-          logger.info('reset electEyeDetect')
+          logger.info('reset deviceStateDetect')
         }
       }
     }

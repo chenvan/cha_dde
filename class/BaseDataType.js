@@ -41,6 +41,9 @@ class TraceSettingData {
       ]
     )
 
+    // console.log(settingValue)
+    // console.log(realValue)
+
     let realPrecis = Math.abs(settingValue - realValue) * 100 / settingValue
     let temp
     

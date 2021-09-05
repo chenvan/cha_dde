@@ -16,7 +16,8 @@ const voiceConfig = require('../config/voiceTips.json')
 */
 
 function loadVoiceTips(location, key, brandName){
-  if(!voiceConfig.hasOwnProperty[location] || !voiceConfig[location].hasOwnProperty(key)) {
+
+  if(!voiceConfig.hasOwnProperty(location) || !voiceConfig[location].hasOwnProperty(key)) {
     console.log(`${location} ${key} voice tips does not exist`)
 
     return []

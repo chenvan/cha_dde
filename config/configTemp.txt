@@ -1,3 +1,17 @@
+64回潮：
+回潮筒批号 Galaxy:rHN_Z6.HN6.Z6_ZCBC_CurrBatchNo
+回潮筒牌号 Galaxy:rHN_Z6.HN6.Z6_ZCBC_CurrRecName
+除杂批号 Galaxy:ZY2_YPCylinder_JK.ProductUnit.Batch_Now
+除杂牌号 Galaxy:ZY2_YPCylinder_JK.ProductUnit.BrandName_Now
+电子秤实际流量 Galaxy:rHN_Z6.HN6.Z6_ZCBC_DB1Value_1
+电子秤设定流量 Galaxy:rHN_Z6.HN6.Z6_ZCBC_DB1Value_2
+电子秤累积量 Galaxy:rHN_Z6.HN6.Z6_ZCBC_DB1Value_3
+切片机入口电机 Galaxy:ZY2KT.Topic_ZS6.FT_DP1_M1_STATE
+切片机出口电眼低（假） Galaxy:ZY2KT.Topic_ZS6.FT_DP4_B1_1
+切片机出口电眼中 Galaxy:ZY2KT.Topic_ZS6.FT_DP4_B1_2
+切片机出口电眼高 Galaxy:ZY2KT.Topic_ZS6.FT_DP5_B1_1
+切片机出口电眼最高 Galaxy:ZY2KT.Topic_ZS6.FT_DP5_B1_2
+
 64加料：
 牌号：Galaxy:ZY2_YPSpice_JK.ProductUnit.BrandName_Now
 入口水分仪状态：Galaxy:ZY2_YPSpice_JK.ProductUnit.MoistureMeter_JLQ.Read_Trim<>Galaxy:ZY2_YPSpice_JK.ProductUnit.MoistureMeter_JLQ.Write_Trim

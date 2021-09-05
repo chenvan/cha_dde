@@ -3,19 +3,19 @@
     "serverName": "VMGZZSHMI3",
     "traceData": {
       "回潮筒批次": {
-        "itemName": "Galaxy:ZY2_YPSpice_JK.ProductUnit.Batch_Now",
+        "itemName": "Galaxy:rHN_Z6.HN6.Z6_ZCBC_CurrBatchNo",
         "valueType": "string",
         "classType": "switch"
       },
       "除杂批次": {
-        "itemName": "Galaxy:ZY2_YPSpice_JK.ProductUnit.Batch_Now",
+        "itemName": "Galaxy:ZY2_YPCylinder_JK.ProductUnit.Batch_Now",
         "valueType": "string",
         "classType": "switch"
       },
       "电子秤状态": {
         "itemName": {
-          "setting": "Galaxy:ZY2_YPSpice_JK.Balance_YX227.FluxSP",
-          "real": "Galaxy:ZY2_YPSpice_JK.Balance_YX227.Flux"
+          "setting": "Galaxy:rHN_Z6.HN6.Z6_ZCBC_DB1Value_1",
+          "real": "Galaxy:rHN_Z6.HN6.Z6_ZCBC_DB1Value_2"
         },
         "valueType": "int",
         "precis": 1,

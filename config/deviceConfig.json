@@ -1,0 +1,29 @@
+{
+  "六四加料": {
+    "提升带电眼": {
+      "itemName": "Galaxy:ZY2_YPOutSilo_JK.Feed_YX225.Switch.Bottom",
+      "maxTime": 20
+    },
+    "进暂存柜电眼": {
+      "itemName": "Galaxy:ZY2_YPOutSilo_JK.Feed_YX225.Switch.Full",
+      "maxTime": 40
+    }
+  },
+  "六四回潮": {
+    "切片前输送带": {
+      "itemName": "Galaxy:ZY2KT.Topic_ZS6.FT_DP1_M1_STATE",
+      "maxTime": 90,
+      "detectState": 33
+    },
+    "切片出口电眼": {
+      "itemName": "Galaxy:ZY2KT.Topic_ZS6.FT_DP5_B1_1",
+      "maxTime": 20,
+      "detectState": 0
+    },
+    "电子秤入口电眼": {
+      "itemName": "Galaxy:ZY2KT.Topic_ZS6.FT_DP5_B1_2",
+      "maxTime": 20,
+      "detectState": 0
+    }
+  }
+}
