@@ -4,7 +4,7 @@
       "itemName": "Galaxy:ZY2_YPOutSilo_JK.Feed_YX225.Switch.Bottom",
       "maxTime": 20
     },
-    "进暂存柜电眼": {
+    "暂存柜入柜电眼": {
       "itemName": "Galaxy:ZY2_YPOutSilo_JK.Feed_YX225.Switch.Full",
       "maxTime": 40
     }
@@ -20,7 +20,7 @@
       "maxTime": 20,
       "detectState": 0
     },
-    "电子秤入口电眼": {
+    "秤前电眼": {
       "itemName": "Galaxy:ZY2KT.Topic_ZS6.FT_DP5_B1_2",
       "maxTime": 20,
       "detectState": 0

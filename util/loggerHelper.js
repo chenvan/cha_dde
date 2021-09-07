@@ -1,4 +1,17 @@
 const { createLogger, format, transports } = require("winston")
+const fs = require('fs')
+const path = require('path')
+
+/*
+    不同的运行环境，logger不一样
+*/
+
+let rootPath = path.join("D:","cha_dde","logs")
+
+let infix = process.env.NODE_ENV === "test" ? ".test." : ".prod."
+
+let errFileName = ''.concat('error', infix, 'log')
+let infoFileName = ''.concat('combined', infix, 'log')
 
 const logger = createLogger({
     level: 'info',
@@ -8,25 +21,16 @@ const logger = createLogger({
         }),
         format.errors({stack: true}),
         format.splat(),
-        format.json()
+        format.json(),
+        format.colorize(),
+        format.simple()
     ),
-    // defaultMeta: {service: 'user-service'},
     transports: [
-        new transports.File({filename: 'error.log', level: 'error'}),
-        new transports.File({filename: 'combined.log'}),
+        new transports.File({filename: path.join(rootPath, errFileName), level: 'error', maxsize: 1000}),
+        new transports.File({filename: path.join(rootPath, infoFileName), level: 'info', maxsize: 1000}),
+        new transports.Console()
     ],
 })
-
-if(process.env.NODE_ENV !== 'production') {
-    logger.add(
-        new transports.Console({
-            format: format.combine(
-                format.colorize(),
-                format.simple()
-            )
-        })
-    )
-}
 
 module.exports = {
     logger

@@ -4,8 +4,8 @@
   "description": "cha by netDDE",
   "main": "app.js",
   "scripts": {
-    "test": "SET NODE_ENV='test' && node test.js",
-    "start": "SET NODE_ENV='production' && node app.js"
+    "test": "SET NODE_ENV=test&&node test.js",
+    "start": "SET NODE_ENV=production&&node test.js"
   },
   "author": "",
   "license": "ISC",
