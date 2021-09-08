@@ -1,5 +1,4 @@
 const { createLogger, format, transports } = require("winston")
-const fs = require('fs')
 const path = require('path')
 
 /*
@@ -22,13 +21,13 @@ const logger = createLogger({
         format.errors({stack: true}),
         format.splat(),
         format.json(),
-        format.colorize(),
+        // format.colorize(),
         format.simple()
     ),
     transports: [
-        new transports.File({filename: path.join(rootPath, errFileName), level: 'error', maxsize: 1000}),
-        new transports.File({filename: path.join(rootPath, infoFileName), level: 'info', maxsize: 1000}),
-        new transports.Console()
+        new transports.File({filename: path.join(rootPath, errFileName), level: 'error', maxsize: 100000}),
+        new transports.File({filename: path.join(rootPath, infoFileName), level: 'info', maxsize: 100000}),
+        new transports.Console({format: format.combine(format.colorize())})
     ],
 })
 

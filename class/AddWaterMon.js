@@ -5,7 +5,7 @@ const { DeviceStateDetect } = require('./DeviceStateDetect')
 const { fetchDDE } = require('../util/fetchDDE')
 const { initTraceData } = require('../util/initTraceData')
 // const { checkMoistureMeter } = require('../util/checkPara')
-// const { loadVoiceTips } = require('../util/loadVoiceTips')
+const { loadVoiceTips } = require('../util/loadVoiceTips')
 const { logger } = require('../util/loggerHelper')
 
 const AddWaterConfig = require('../config/AddWaterConfig.json')
@@ -29,7 +29,7 @@ class AddWaterMon {
     this.isWaterBatchChange = false
     this.isCleanUpBatchChange = false
 
-    // this.voiceTipsTimeId = []
+    this.voiceTipsTimeId = []
     
   }
 
@@ -50,14 +50,14 @@ class AddWaterMon {
           if(key === "回潮筒批次" && this.traceDataCol[key].currentValue.slice(0, -3) !== "") {
             // 回潮筒批次变更
             
-            logger.info("回潮筒批次变更")
+            logger.info(`回潮筒批次变更:${this.traceDataCol[key].currentValue.slice(0, -3)}.`)
 
             this.isWaterBatchChange = true
 
           } else if(key === "除杂批次" && this.traceDataCol[key].currentValue.slice(0, -3) !== "") {
             // 除杂段批次变更
 
-            logger.info("除杂批次变更")
+            logger.info(`除杂批次变更:${this.traceDataCol[key].currentValue.slice(0, -3)}.`)
 
             this.isCleanUpBatchChange = true
 
@@ -79,36 +79,52 @@ class AddWaterMon {
 
               this.deviceStateDetect.isMon = true
 
+              if(this.traceDataCol[key].lastValue !== undefined) {
+                this.voiceTipsTimeId = loadVoiceTips(this.location, key, this.currentBrandName)
+              }
+
             } else if(this.traceDataCol[key].currentValue === 0) {
               
               this.deviceStateDetect.isMon = false
+
+              if(this.traceDataCol[key].lastValue !== undefined) {
+                this.voiceTipsTimeId.forEach(timeId => clearTimeout(timeId))
+              }
 
             }
           }
         }
       } catch (err) {
         
-        logger.info(key)
-        logger.error(err)
+        logger.error(key, err)
 
         if (err.message === "Not connected") {
-          // await this.electEyeDetect.reset()
+          await this.deviceStateDetect.reset()
 
-          // logger.info('reset electEyeDetect')
+          logger.info('reset deviceStateDetect')
         }
       }
     }
 
     if(this.isWaterBatchChange && this.isCleanUpBatchChange) {
-      logger.info('批次变更')
+      logger.info('批次')
+
+      if(this.traceDataCol['回潮筒批次'].currentValue === this.traceDataCol['除杂批次'].currentValue) {
+        
+        let brandNameTemp =  await fetchDDE(this.serverName, 'Galaxy:rHN_Z6.HN6.Z6_ZCBC_CurrRecName', 'string')
+        this.currentBrandName = brandNameTemp.slice(0, -3)
+      
+        if(this.traceDataCol['回潮筒批次'].lastValue !== undefined && this.traceDataCol['除杂批次'].lastValue !== undefined) {
+          loadVoiceTips(this.location, "批次", this.currentBrandName)
+        }
+
+      } else {
+        logger.error(`${this.location}, 回潮筒批次与除杂批次不一致`)
+      }
+
       this.isWaterBatchChange = false
       this.isCleanUpBatchChange = false
     }
-
-    // let motorState = await fetchDDE(this.serverName, "Galaxy:ZY2KT.Topic_ZS6.FT_DP1_M1_STATE", "int")
-    // let electEyeState = await fetchDDE(this.serverName, "Galaxy:ZY2KT.Topic_ZS6.FT_DP5_B1_1", "int")
-    // logger.info(`电机状态：${motorState}`)
-    // logger.info(`电眼状态：${electEyeState}`)
   }
 
   async updateService() {

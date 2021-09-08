@@ -100,8 +100,7 @@ class AddFlavourMon {
         }
       } catch (err) {
         
-        logger.info(key)
-        logger.error(err)
+        logger.error(key, err)
 
         if (err.message === "Not connected") {
           await this.deviceStateDetect.reset()

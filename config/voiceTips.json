@@ -8,8 +8,22 @@
 		],
 		"电子秤状态": [
 			{
-				"offsetInterval" : 180,
+				"offsetInterval" : 120,
 				"content" : "六四加料开始喷料，使用二二五镜头查看加料出口"
+			}
+		]
+	},
+	"六四回潮": {
+		"批次": [
+			{
+				"offsetInterval" : 120,
+				"content" : "六四回潮检查出口翻板门"
+			}
+		],
+		"电子秤状态": [
+			{
+				"offsetInterval" : 120,
+				"content" : "六四回潮检查加水"
 			}
 		]
 	}
