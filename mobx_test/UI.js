@@ -1,4 +1,5 @@
 const { now } = require('mobx-utils')
+const { add } = require('winston')
 
 function genWeigthBellState(name, weightBell) {
 
@@ -29,14 +30,15 @@ function genDeviceState(device) {
 }
 
 function genAddFlavourState(addFlavour) {
-  return  `批号: ${addFlavour.id}\n` +
+  return  `牌号: ${addFlavour.brandName}\n批号: ${addFlavour.id}\n` +
     genCabinetState(addFlavour.cabinet) +
+    `${addFlavour.cabinet.total} - ${addFlavour.mainWeightBell.accu} = ${addFlavour.cabinet.total - addFlavour.mainWeightBell.accu}\n` +
     genWeigthBellState("主秤", addFlavour.mainWeightBell) + 
     addFlavour.deviceList.map(device => genDeviceState(device)).join('')
 }
 
 function genAddWaterState(addWater) {
-  return  `回潮批号: ${addWater.idMap['回潮批号']} 除杂批号: ${addWater.idMap['除杂批号']}\n` +
+  return  `牌号: ${addWater.brandName}\n回潮批号: ${addWater.idMap['回潮批号']} 除杂批号: ${addWater.idMap['除杂批号']}\n` +
     genWeigthBellState("主秤", addWater.mainWeightBell) + 
     genWeigthBellState("薄片秤", addWater.flakeWeightBell) +
     addWater.deviceList.map(device => genDeviceState(device)).join('')

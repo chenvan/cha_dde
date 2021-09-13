@@ -2,7 +2,8 @@
 
 const config = require("../mobx_test_config/AddWater.json")
 const { makeAutoObservable, action, reaction, autorun, runInAction, observable } = require("mobx")
-const { setAdvise, fetchDDE } = require("../util/fetchDDE")
+const { setAdvise } = require("../util/fetchDDE")
+const { fetchBrandName } = require("../util/fetchUtil")
 const { logger } = require("../util/loggerHelper")
 const WeightBell = require("./WeightBell")
 const { Device, DeviceWithSpecifyState } = require('./Device')
@@ -26,6 +27,7 @@ class AddWater {
   deviceList = []
   mainWeightBell
   flakeWeightBell
+  brandName
 
   constructor(line, container) {
     makeAutoObservable(this, {
@@ -127,6 +129,7 @@ class AddWater {
     if(this.state === "准备") {
       await this.mainWeightBell.fetchSetting(this.serverName)
       await this.flakeWeightBell.fetchSetting(this.serverName)
+      this.brandName = await fetchBrandName(this.serverName, config[this.line]["brandName"]["itemName"], config[this.line]["brandName"]["valueType"])
 
       runInAction(() => {
           this.state = "准备完成"
@@ -134,6 +137,7 @@ class AddWater {
     }else if(this.state === "准备完成" || this.state === "停止") {
 
       await this.mainWeightBell.update(this.serverName)
+      await this.flakeWeightBell.update(this.serverName)
 
       runInAction(() => {
         if(this.mainWeightBell.state === "运行正常") {

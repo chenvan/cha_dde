@@ -1,6 +1,10 @@
 {
   "六四加料": {
     "serverName": "VMGZZSHMI3",
+    "brandName": {
+      "itemName": "Galaxy:ZY2_YPSpice_JK.ProductUnit.BrandName_Now",
+      "valueType": "string"
+    },
     "advise": {
       "加料批号": {
         "itemName": "Galaxy:ZY2_YPSpice_JK.ProductUnit.Batch_Now",
@@ -31,7 +35,7 @@
         "valueType": "int"
       },
       "electEye": {
-        "name":"定量管高电眼",
+        "name":"主秤定量管高电眼",
         "itemName": "Galaxy:ZY2_YPOutSilo_JK.Limit_YX226.High",
         "type": "device",
         "maxTime": 40

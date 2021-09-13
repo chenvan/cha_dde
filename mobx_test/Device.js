@@ -54,8 +54,8 @@ class Device {
     let duration = (now - this.lastUpdateMoment) / 1000
     logger.info(`${this.line} ${this.deviceName}. 状态${this.deviceState}. 持续时间${duration}`)
     if(duration > this.maxDuration && !this.isTrigger) {
-      logger.info(`${this.deviceName} 状态长时间不变.`)
-      speakTwice(`${this.deviceName} 状态长时间不变.`)
+      logger.error(`${this.line} ${this.deviceName} 状态长时间不变.`)
+      speakTwice(`${this.line} ${this.deviceName} 状态长时间不变.`)
       this.isTrigger = true
     } else if(duration <= this.maxDuration) {
       this.isTrigger = false

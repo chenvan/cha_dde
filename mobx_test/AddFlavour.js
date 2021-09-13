@@ -2,7 +2,8 @@
 
 const config = require("../mobx_test_config/AddFlavour.json")
 const { makeAutoObservable, action, reaction, override, autorun, runInAction } = require("mobx")
-const { setAdvise, fetchDDE } = require("../util/fetchDDE")
+const { setAdvise } = require("../util/fetchDDE")
+const { fetchBrandName } = require("../util/fetchUtil")
 const { logger } = require("../util/loggerHelper")
 const { speakTwice } = require("../util/speak")
 const Cabinet = require('./Cabinet')
@@ -36,6 +37,7 @@ class AddFlavour {
   deviceList = []
   mainWeightBell
   cabinet
+  brandName
 
 
   constructor(line, container) {
@@ -127,8 +129,8 @@ class AddFlavour {
       await this.mainWeightBell.fetchSetting(this.serverName)
 
       // 检查参数
-      // checkPara()
       await checkPara(this.line, this.serverName, config[this.line]["para"])
+      this.brandName = await fetchBrandName(this.serverName, config[this.line]["brandName"]["itemName"], config[this.line]["brandName"]["valueType"])
 
       runInAction(() => {
         if (this.cabinet.state === "监控") {

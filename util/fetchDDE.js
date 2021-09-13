@@ -12,7 +12,7 @@ async function fetchDDE (serverName, itemName, returnType) {
 
     let temp = await request(serverName, itemName)
 
-    if(returnType == 'int') {
+    if(returnType === 'int') {
         let intTemp = parseInt(temp, 10)
 
         if (Number.isNaN(intTemp)) throw Error(`${serverName}:${itemName} -> get ${temp} is not a number`)

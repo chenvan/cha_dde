@@ -1,6 +1,10 @@
 {
   "六四回潮": {
     "serverName": "VMGZZSHMI3",
+    "brandName": {
+      "itemName": "Galaxy:rHN_Z6.HN6.Z6_ZCBC_CurrRecName",
+      "valueType": "string"
+    },
     "advise": {
       "回潮批号": {
         "itemName": "Galaxy:rHN_Z6.HN6.Z6_ZCBC_CurrBatchNo",
@@ -38,7 +42,7 @@
           "valueType": "int"
         },
         "electEye": {
-          "name":"秤前电眼",
+          "name":"主秤入口电眼",
           "itemName": "Galaxy:ZY2KT.Topic_ZS6.FT_DP5_B1_2",
           "type": "device",
           "maxTime": 20,
@@ -59,7 +63,7 @@
           "valueType": "int"
         },
         "electEye": {
-          "name":"定量管高电眼",
+          "name":"薄片秤定量管高电眼",
           "itemName": "Galaxy:ZY2_YPCylinder_JK.ZY2_NewPart.ZY2_BP.Feed205.Switch.High",
           "type": "device",
           "maxTime": 40

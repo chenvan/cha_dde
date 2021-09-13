@@ -29,7 +29,8 @@ class Cabinet {
       () => {
         if(this.cabinetConfig.hasOwnProperty(this.outputNr)) {
           if (this.state === "监控") {
-            logger.info(`监控状态下, 出柜号发生更换`)
+            logger.error(`监控状态下, 出柜号发生更换`)
+            speakTwice(`${this.line} 监控状态下, 出柜号发生更换`)
           }
 
           this.state = "获取信息"
@@ -90,7 +91,7 @@ class Cabinet {
       logger.info(`halfEyeState: ${halfEyeState}`)
 
       if(halfEyeState === 1) {
-        logger.info(`${this.line} 加料出柜未转高速`)
+        logger.error(`${this.line} 加料出柜未转高速`)
         speakTwice(`${this.line} 加料出柜未转高速`)
       }
 
