@@ -1,5 +1,6 @@
+'use strict'
+
 const { now } = require('mobx-utils')
-const { add } = require('winston')
 
 function genWeigthBellState(name, weightBell) {
 

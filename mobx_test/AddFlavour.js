@@ -10,7 +10,8 @@ const Cabinet = require('./Cabinet')
 const WeightBell = require('./WeightBell')
 const { Device } = require('./Device')
 const { genAddFlavourState } = require('./UI')
-const { checkPara } = require('../util/checkPara2')
+const { checkPara } = require('../util/checkParaUtil')
+const { loadVoiceTips, clearVoiceTips, setRunningVoiceTips, setReadyVoiceTips } = require('../util/voiceTipsUtil')
 
 /*
 加料监控状态
@@ -38,6 +39,8 @@ class AddFlavour {
   mainWeightBell
   cabinet
   brandName
+  isSetRunningVoiceTips
+  voiceTipsConfig
 
 
   constructor(line, container) {
@@ -45,7 +48,9 @@ class AddFlavour {
       line: false,
       container: false,
       serverName: false,
-      updateCount: false
+      updateCount: false,
+      voiceTipsConfig: false,
+      isSetRunningVoiceTips: false
     })
   
     this.line = line
@@ -57,13 +62,15 @@ class AddFlavour {
     this.mainWeightBell = new WeightBell(this.line, "主秤", config[line]["mainWeightBell"])
     this.cabinet = new Cabinet(this.line, config[line]["cabinet"])
 
-    // build container children, or just use autorun?
+    this.voiceTipsConfig = loadVoiceTips(this.line, "加料")
+    this.isSetRunningVoiceTips = false
 
     reaction(
       () => this.id,
       id => {
         if(this.state === "停止" && id) {
           this.state = "准备"
+          this.isSetRunningVoiceTips = false
         }
       }
     )
@@ -130,6 +137,7 @@ class AddFlavour {
 
       // 检查参数
       await checkPara(this.line, this.serverName, config[this.line]["para"])
+
       this.brandName = await fetchBrandName(this.serverName, config[this.line]["brandName"]["itemName"], config[this.line]["brandName"]["valueType"])
 
       runInAction(() => {
@@ -156,6 +164,12 @@ class AddFlavour {
       await this.mainWeightBell.update(this.serverName)
 
       await this.cabinet.checkHalfEyeState(this.serverName, this.mainWeightBell.accu)
+
+      // 加载语音
+      if(!this.isSetRunningVoiceTips) {
+        setRunningVoiceTips(this.voiceTipsConfig["running"], this.brandName, this.mainWeightBell.setting, this.mainWeightBell.accu)
+        this.isSetRunningVoiceTips = true
+      }
 
       runInAction(() => {
         if(this.mainWeightBell.state === "运行停止") {

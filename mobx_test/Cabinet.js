@@ -37,12 +37,6 @@ class Cabinet {
         }
       }
     )
-
-    // autorun(() => {
-    //   console.log("cabinet 出柜")
-    //   console.log(this.state, this.total, this.outputNr)
-    //   console.log("===========================")
-    // })
   }
 
   async init(serverName) {
