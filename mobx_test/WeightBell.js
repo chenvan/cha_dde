@@ -34,12 +34,6 @@ class WeightBell {
     this.name = name
     this.weightBellConfig = weightBellConfig
     this.isTrigger = false
-
-    // autorun(() => {
-    //   console.log("weight bell 电子秤")
-    //   console.log(this.state, this.setting, this.real, this.accu)
-    //   console.log("=============================")
-    // })
   }
 
   async init(serverName) {
@@ -63,9 +57,9 @@ class WeightBell {
     }
   }
 
-  async reConnect(serverName) {
-    await this.electEye.reConnect(serverName)
-  }
+  // async reConnect(serverName) {
+  //   await this.electEye.reConnect(serverName)
+  // }
 
   async fetchSetting(serverName) {
     let setting = await fetchDDE(

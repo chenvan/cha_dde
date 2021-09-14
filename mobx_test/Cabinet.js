@@ -46,9 +46,9 @@ class Cabinet {
     }))
   }
 
-  async reConnect(serverName) {
-    await this.init(serverName)
-  }
+  // async reConnect(serverName) {
+  //   await this.init(serverName)
+  // }
 
   async updateCabinetInfo(serverName) {
     if (this.state === "获取信息") {

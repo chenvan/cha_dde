@@ -27,8 +27,8 @@ const logger = createLogger({
         format.simple()
     ),
     transports: [
-        new transports.File({filename: path.join(rootPath, errFileName), level: 'error', maxsize: 1000000}),
-        new transports.File({filename: path.join(rootPath, infoFileName), level: 'info', maxsize: 1000000}),
+        new transports.File({filename: path.join(rootPath, errFileName), level: 'error', maxsize: 10000000}),
+        new transports.File({filename: path.join(rootPath, infoFileName), level: 'info', maxsize: 10000000}),
     ],
 })
 

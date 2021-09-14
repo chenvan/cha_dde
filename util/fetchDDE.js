@@ -1,5 +1,6 @@
 const { NetDDEClient, Constants } = require('netdde')
 const fakeDataConfig = require("../mobx_test_config/test.json")
+const { logger } = require("../util/loggerHelper")
 
 const serverNameList = ["VMGZZSHMI3", "VMGZZSHMI6"]
 
@@ -72,12 +73,10 @@ async function connectServer(serverName) {
             
     tempClient.on("error", err => {
         //Error: read ECONNRESET
-        console.log('listen error')
-        console.log(serverName)
-        console.log(err)
+        logger.error(`${serverName} connect error ${err}`)
         
         delete connectingServers[serverName]
-    }) // 通信中断的 error 出现在这？
+    })
     
     await tempClient.connect().then(() => {
         connectingServers[serverName] = tempClient
@@ -123,6 +122,7 @@ if (process.env.NODE_ENV === 'test' || process.env.NODE_ENV === "dev") {
     module.exports = {
         fetchDDE,
         setAdvise,
-        disconnectAllClients
+        disconnectAllClients,
+        cancelAdvise
     }
 }

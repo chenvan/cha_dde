@@ -24,8 +24,19 @@ DDE 获取数据的方式是 fetch 和 set advice, 为了方便开发需要在 t
 
 #### 方法2：
 
+在 mon 的 update 函数里，弄一个 try ... catch  的语句，出现错误后，把 mon 的状态转到“出错”，然后在“出错”状态里，尝试获取 server 的秒数，然后进行 reConnect，把状态转到“准备”
+
 # UI显示
 
 使用 [blessed](https://github.com/chjj/blessed#windows-compatibility) 和 [blessed-contrib](https://github.com/yaronn/blessed-contrib) 来展示UI
 
-对于每一个监控单元传递一个box, 然后监控单元里, 使用 mobx 的 autorun 输出监控单元的状态, 
+对于每一个监控单元传递一个box, 然后监控单元里, 使用 mobx 的 autorun 输出监控单元的状态
+
+
+# Bug
+
+## 加料
+
+### 当加料机完成停机(可能还包含其他条件), 监控单元再进行初始化，加料会转移到“准备完成”的状态。当进行换批后 reaction 没法从”准备完成“跳转到“准备”
+
+在 reaction 中去除 this.state 的条件

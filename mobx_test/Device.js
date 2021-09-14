@@ -33,11 +33,10 @@ class Device {
     this.maxDuration = maxDuration
     this.itemName = itemName
     this.isTrigger = false
-
   }
 
   async init(serverName) {
-    logger.info(`${this.deviceName}初始化`)
+    // logger.info(`${this.deviceName}初始化`)
     await setAdvise(serverName, this.itemName, action(state => {
       // logger.info(`${this.deviceName} state change to ${state.data}.`)
       this.deviceState = parseInt(state.data, 10)
@@ -45,14 +44,14 @@ class Device {
     }))
   }
 
-  async reConnect(serverName) {
-    logger.info(`${this.deviceName}重启`)
-    await this.init(serverName)
-  }
+  // async reConnect(serverName) {
+  //   logger.info(`${this.deviceName}重启`)
+  //   await this.init(serverName)
+  // }
 
   checkState(now) {
     let duration = (now - this.lastUpdateMoment) / 1000
-    logger.info(`${this.line} ${this.deviceName}. 状态${this.deviceState}. 持续时间${duration}`)
+    // logger.info(`${this.line} ${this.deviceName}. 状态${this.deviceState}. 持续时间${duration}`)
     if(duration > this.maxDuration && !this.isTrigger) {
       logger.error(`${this.line} ${this.deviceName} 状态长时间不变.`)
       speakTwice(`${this.line} ${this.deviceName} 状态长时间不变.`)

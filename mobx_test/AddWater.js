@@ -3,7 +3,7 @@
 const config = require("../mobx_test_config/AddWater.json")
 const { makeAutoObservable, action, reaction, autorun, runInAction, observable } = require("mobx")
 const { setAdvise } = require("../util/fetchDDE")
-const { fetchBrandName } = require("../util/fetchUtil")
+const { fetchBrandName, testServerConnect } = require("../util/fetchUtil")
 const { logger } = require("../util/loggerHelper")
 const WeightBell = require("./WeightBell")
 const { Device, DeviceWithSpecifyState } = require('./Device')
@@ -109,6 +109,8 @@ class AddWater {
 
   
   async initAdviseData(adviseConfigMap) {
+    this.deviceList = []
+
     for(const[key, value] of Object.entries(adviseConfigMap)) {
       logger.info(`init advise -> ${key}: ${value}`)
       
@@ -137,80 +139,89 @@ class AddWater {
   }
 
   async update() {
+    try {
 
-    this.refreshUpdateCount()
+      this.refreshUpdateCount()
 
-    if(this.state === "准备") {
-      await Promise.all([
-        this.mainWeightBell.fetchSetting(this.serverName),
-        this.flakeWeightBell.fetchSetting(this.serverName)
-      ])
-      // await this.mainWeightBell.fetchSetting(this.serverName)
-      // await this.flakeWeightBell.fetchSetting(this.serverName)
-      this.brandName = await fetchBrandName(this.serverName, config[this.line]["brandName"]["itemName"], config[this.line]["brandName"]["valueType"])
+      if(this.state === "准备") {
+        await Promise.all([
+          this.mainWeightBell.fetchSetting(this.serverName),
+          this.flakeWeightBell.fetchSetting(this.serverName)
+        ])
+        // await this.mainWeightBell.fetchSetting(this.serverName)
+        // await this.flakeWeightBell.fetchSetting(this.serverName)
+        this.brandName = await fetchBrandName(this.serverName, config[this.line]["brandName"]["itemName"], config[this.line]["brandName"]["valueType"])
 
-      runInAction(() => {
-          this.state = "准备完成"
-      })
-    }else if(this.state === "准备完成") {
+        runInAction(() => {
+            this.state = "准备完成"
+        })
+      } else if(this.state === "准备完成") {
 
-      // await this.mainWeightBell.update(this.serverName)
-      // await this.flakeWeightBell.update(this.serverName)
-      await Promise.all([
-        this.mainWeightBell.fetchSetting(this.serverName),
-        this.flakeWeightBell.fetchSetting(this.serverName)
-      ])
+        // await this.mainWeightBell.update(this.serverName)
+        // await this.flakeWeightBell.update(this.serverName)
+        await Promise.all([
+          this.mainWeightBell.update(this.serverName),
+          this.flakeWeightBell.update(this.serverName)
+        ])
 
-      if(!this.isSetReadyVoiceTips && this.mainWeightBell.accu === 0) {
-        this.readyTimeoutList = setReadyVoiceTips(this.voiceTipsConfig["ready"], this.brandName)
-        this.isSetReadyVoiceTips = true
-      }
-
-      runInAction(() => {
-        if(this.mainWeightBell.state === "运行正常") {
-          this.state = "监控"
+        if(!this.isSetReadyVoiceTips && this.mainWeightBell.accu === 0) {
+          this.readyTimeoutList = setReadyVoiceTips(this.voiceTipsConfig["ready"], this.brandName)
+          this.isSetReadyVoiceTips = true
         }
-      })
-      
-    }else if(this.state === "监控") {
-      // 检查 device 状态持续时间是否符合要求
-      this.checkDeviceState()
 
-      await this.mainWeightBell.update(this.serverName)
-      
-      // 加载语音
-      if(!this.isSetRunningVoiceTips) {
-        this.runningTimeoutList = setRunningVoiceTips(this.voiceTipsConfig["running"], this.brandName, this.mainWeightBell.setting, this.mainWeightBell.accu)
-        this.isSetRunningVoiceTips = true
-      }
+        runInAction(() => {
+          if(this.mainWeightBell.state === "运行正常") {
+            this.state = "监控"
+          }
+        })
+        
+      } else if(this.state === "监控") {
+        // 检查 device 状态持续时间是否符合要求
+        this.checkDeviceState()
 
-      if(this.flakeWeightBell.state !== "不运行") {
-        await this.flakeWeightBell.update(this.serverName)
-      }
-
-      runInAction(() => {
-        if(this.mainWeightBell.state === "运行停止") {
-          this.state = "停止"
+        await this.mainWeightBell.update(this.serverName)
+        
+        // 加载语音
+        if(!this.isSetRunningVoiceTips) {
+          this.runningTimeoutList = setRunningVoiceTips(this.voiceTipsConfig["running"], this.brandName, this.mainWeightBell.setting, this.mainWeightBell.accu)
+          this.isSetRunningVoiceTips = true
         }
-      })
-    }else if(this.state === "停止") {
-      await this.mainWeightBell.update(this.serverName)
 
-      if(this.isSetRunningVoiceTips) {
-        clearVoiceTips(this.runningTimeoutList)
-        this.isSetRunningVoiceTips = false
-      }
-
-      if(this.isSetReadyVoiceTips) {
-        clearVoiceTips(this.readyTimeoutList)
-        this.isSetReadyVoiceTips = false
-      }
-
-      runInAction(() => {
-        if(this.mainWeightBell.state === "运行正常") {
-          this.state = "监控"
+        if(this.flakeWeightBell.state !== "不运行") {
+          await this.flakeWeightBell.update(this.serverName)
         }
-      })
+
+        runInAction(() => {
+          if(this.mainWeightBell.state === "运行停止") {
+            this.state = "停止"
+          }
+        })
+      } else if(this.state === "停止") {
+        await this.mainWeightBell.update(this.serverName)
+
+        if(this.isSetRunningVoiceTips) {
+          clearVoiceTips(this.runningTimeoutList)
+          this.isSetRunningVoiceTips = false
+        }
+
+        if(this.isSetReadyVoiceTips) {
+          clearVoiceTips(this.readyTimeoutList)
+          this.isSetReadyVoiceTips = false
+        }
+
+        runInAction(() => {
+          if(this.mainWeightBell.state === "运行正常") {
+            this.state = "监控"
+          }
+        })
+      } else if(this.state === "出错") {
+        await testServerConnect(this.serverName)
+        await this.reConnect()
+        runInAction(() => this.state = "准备")
+      }
+    } catch(err) {
+      logger.error(err)
+      runInAction(() => this.state = "出错")
     } 
   }
 
