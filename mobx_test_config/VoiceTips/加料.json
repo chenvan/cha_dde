@@ -1,12 +1,15 @@
 {
     "六四加料": {
         "ready": [
-
+            {
+                "offset": 60,
+                "content": "六四加料检查出口翻版门" 
+            }
         ],
         "running": [
             {
-                "offset": 300,
-                "content": "测试"
+                "offset": 120,
+                "content": "六四加料检查入柜情况"
             }
         ]
     }

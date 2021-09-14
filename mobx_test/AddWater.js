@@ -8,6 +8,8 @@ const { logger } = require("../util/loggerHelper")
 const WeightBell = require("./WeightBell")
 const { Device, DeviceWithSpecifyState } = require('./Device')
 const { genAddWaterState } = require('./UI')
+const { loadVoiceTips, clearVoiceTips, setRunningVoiceTips, setReadyVoiceTips } = require('../util/voiceTipsUtil')
+
 /*
 回潮
 
@@ -28,13 +30,23 @@ class AddWater {
   mainWeightBell
   flakeWeightBell
   brandName
+  isSetRunningVoiceTips
+  runningTimeoutList
+  isSetReadyVoiceTips
+  readyTimeoutList
+  voiceTipsConfig
 
   constructor(line, container) {
     makeAutoObservable(this, {
       line: false,
       container: false,
       serverName: false,
-      updateCount: false
+      updateCount: false,
+      isSetRunningVoiceTips: false,
+      runningTimeoutList: false,
+      isSetReadyVoiceTips: false,
+      readyTimeoutList: false,
+      voiceTipsConfig: false
     })
   
     this.line = line
@@ -47,6 +59,12 @@ class AddWater {
     this.flakeWeightBell = new WeightBell(this.line, "薄片秤", config[line]["weightBell"]["薄片秤"])
     this.isAddWaterIdChange = false
     this.isRemoveIdChange = false
+
+    this.isSetReadyVoiceTips = false
+    this.isSetRunningVoiceTips = false
+    this.runningTimeoutList = []
+    this.readyTimeoutList = []
+    this.voiceTipsConfig = loadVoiceTips(this.line, "回潮")
 
     // 这个 reaction 稍微显得麻烦一点
     reaction(
@@ -134,10 +152,15 @@ class AddWater {
       runInAction(() => {
           this.state = "准备完成"
       })
-    }else if(this.state === "准备完成" || this.state === "停止") {
+    }else if(this.state === "准备完成") {
 
       await this.mainWeightBell.update(this.serverName)
       await this.flakeWeightBell.update(this.serverName)
+
+      if(!this.isSetReadyVoiceTips && this.mainWeightBell.accu === 0) {
+        this.readyTimeoutList = setReadyVoiceTips(this.voiceTipsConfig["ready"], this.brandName)
+        this.isSetReadyVoiceTips = true
+      }
 
       runInAction(() => {
         if(this.mainWeightBell.state === "运行正常") {
@@ -150,6 +173,12 @@ class AddWater {
       this.checkDeviceState()
 
       await this.mainWeightBell.update(this.serverName)
+      
+      // 加载语音
+      if(!this.isSetRunningVoiceTips) {
+        this.runningTimeoutList = setRunningVoiceTips(this.voiceTipsConfig["running"], this.brandName, this.mainWeightBell.setting, this.mainWeightBell.accu)
+        this.isSetRunningVoiceTips = true
+      }
 
       if(this.flakeWeightBell.state !== "不运行") {
         await this.flakeWeightBell.update(this.serverName)
@@ -158,6 +187,24 @@ class AddWater {
       runInAction(() => {
         if(this.mainWeightBell.state === "运行停止") {
           this.state = "停止"
+        }
+      })
+    }else if(this.state === "停止") {
+      await this.mainWeightBell.update(this.serverName)
+
+      if(this.isSetRunningVoiceTips) {
+        clearVoiceTips(this.runningTimeoutList)
+        this.isSetRunningVoiceTips = false
+      }
+
+      if(this.isSetReadyVoiceTips) {
+        clearVoiceTips(this.readyTimeoutList)
+        this.isSetReadyVoiceTips = false
+      }
+
+      runInAction(() => {
+        if(this.mainWeightBell.state === "运行正常") {
+          this.state = "监控"
         }
       })
     } 

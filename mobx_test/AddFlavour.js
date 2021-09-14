@@ -40,6 +40,9 @@ class AddFlavour {
   cabinet
   brandName
   isSetRunningVoiceTips
+  runningTimeoutList
+  isSetReadyVoiceTips
+  readyTimeoutList
   voiceTipsConfig
 
 
@@ -50,7 +53,10 @@ class AddFlavour {
       serverName: false,
       updateCount: false,
       voiceTipsConfig: false,
-      isSetRunningVoiceTips: false
+      isSetRunningVoiceTips: false,
+      isSetReadyVoiceTips: false,
+      runningTimeoutList: false,
+      readyTimeoutList: false
     })
   
     this.line = line
@@ -64,13 +70,16 @@ class AddFlavour {
 
     this.voiceTipsConfig = loadVoiceTips(this.line, "加料")
     this.isSetRunningVoiceTips = false
+    this.runningTimeoutList = []
+    this.isSetReadyVoiceTips = false
+    this.readyTimeoutList = []
 
     reaction(
       () => this.id,
       id => {
         if(this.state === "停止" && id) {
           this.state = "准备"
-          this.isSetRunningVoiceTips = false
+          // this.isSetRunningVoiceTips = false
         }
       }
     )
@@ -140,6 +149,8 @@ class AddFlavour {
 
       this.brandName = await fetchBrandName(this.serverName, config[this.line]["brandName"]["itemName"], config[this.line]["brandName"]["valueType"])
 
+      
+
       runInAction(() => {
         if (this.cabinet.state === "监控") {
           this.state = "准备完成"
@@ -149,6 +160,11 @@ class AddFlavour {
     }else if(this.state === "准备完成" || this.state === "停止") {
 
       await this.mainWeightBell.update(this.serverName)
+
+      if(!this.isSetReadyVoiceTips && this.mainWeightBell.accu === 0) {
+        this.readyTimeoutList = setReadyVoiceTips(this.voiceTipsConfig["ready"], this.brandName)
+        this.isSetReadyVoiceTips = true
+      }
 
       runInAction(() => {
         if(this.mainWeightBell.state === "运行正常") {
@@ -167,13 +183,31 @@ class AddFlavour {
 
       // 加载语音
       if(!this.isSetRunningVoiceTips) {
-        setRunningVoiceTips(this.voiceTipsConfig["running"], this.brandName, this.mainWeightBell.setting, this.mainWeightBell.accu)
+        this.runningTimeoutList = setRunningVoiceTips(this.voiceTipsConfig["running"], this.brandName, this.mainWeightBell.setting, this.mainWeightBell.accu)
         this.isSetRunningVoiceTips = true
       }
 
       runInAction(() => {
         if(this.mainWeightBell.state === "运行停止") {
           this.state = "停止"
+        }
+      })
+    }else if(this.state === "停止") {
+      await this.mainWeightBell.update(this.serverName)
+
+      if(this.isSetRunningVoiceTips) {
+        clearVoiceTips(this.runningTimeoutList)
+        this.isSetRunningVoiceTips = false
+      }
+
+      if(this.isSetReadyVoiceTips) {
+        clearVoiceTips(this.readyTimeoutList)
+        this.isSetReadyVoiceTips = false
+      }
+      
+      runInAction(() => {
+        if(this.mainWeightBell.state === "运行正常") {
+          this.state = "监控"
         }
       })
     } 
