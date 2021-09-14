@@ -101,7 +101,7 @@ class AddFlavour {
   }
 
   async reConnect() {
-
+    await this.init()
   }
 
   async initAdviseData(adviseConfigMap) {
@@ -132,20 +132,23 @@ class AddFlavour {
     }
   }
 
-  async reConnectAdviseData() {
-
-  }
-
   async update() {
 
     this.refreshUpdateCount()
 
     if(this.state === "准备") {
-      await this.cabinet.updateCabinetInfo(this.serverName)
-      await this.mainWeightBell.fetchSetting(this.serverName)
+
+      await Promise.all([
+        this.cabinet.updateCabinetInfo(this.serverName),
+        this.mainWeightBell.fetchSetting(this.serverName),
+        // 检查参数
+        await checkPara(this.line, this.serverName, config[this.line]["para"])
+      ])
+      // await this.cabinet.updateCabinetInfo(this.serverName)
+      // await this.mainWeightBell.fetchSetting(this.serverName)
 
       // 检查参数
-      await checkPara(this.line, this.serverName, config[this.line]["para"])
+      // await checkPara(this.line, this.serverName, config[this.line]["para"])
 
       this.brandName = await fetchBrandName(this.serverName, config[this.line]["brandName"]["itemName"], config[this.line]["brandName"]["valueType"])
 
@@ -157,7 +160,7 @@ class AddFlavour {
         }
       })
       
-    }else if(this.state === "准备完成" || this.state === "停止") {
+    }else if(this.state === "准备完成") {
 
       await this.mainWeightBell.update(this.serverName)
 
@@ -192,6 +195,7 @@ class AddFlavour {
           this.state = "停止"
         }
       })
+      
     }else if(this.state === "停止") {
       await this.mainWeightBell.update(this.serverName)
 

@@ -86,7 +86,7 @@ class AddWater {
     )
 
     autorun(() => {
-      // 在 init 没有完成的时候, autorun 会自己先跑一次, 因此会出现一些 device 没有 init 完成的情况
+      // 在 init 没有完成的时候, autorun 会自己先跑一次, 因此会出现一些 device 没有 init 完成的情况, 先读取了 deviceName
       this.container.setLabel(`${this.line}(${this.state})`)
       this.container.setContent(genAddWaterState(this))
       this.container.parent.render()
@@ -104,7 +104,7 @@ class AddWater {
   }
 
   async reConnect() {
-
+    await this.init()
   }
 
   
@@ -136,17 +136,17 @@ class AddWater {
     }
   }
 
-  async reConnectAdviseData() {
-
-  }
-
   async update() {
 
     this.refreshUpdateCount()
 
     if(this.state === "准备") {
-      await this.mainWeightBell.fetchSetting(this.serverName)
-      await this.flakeWeightBell.fetchSetting(this.serverName)
+      await Promise.all([
+        this.mainWeightBell.fetchSetting(this.serverName),
+        this.flakeWeightBell.fetchSetting(this.serverName)
+      ])
+      // await this.mainWeightBell.fetchSetting(this.serverName)
+      // await this.flakeWeightBell.fetchSetting(this.serverName)
       this.brandName = await fetchBrandName(this.serverName, config[this.line]["brandName"]["itemName"], config[this.line]["brandName"]["valueType"])
 
       runInAction(() => {
@@ -154,8 +154,12 @@ class AddWater {
       })
     }else if(this.state === "准备完成") {
 
-      await this.mainWeightBell.update(this.serverName)
-      await this.flakeWeightBell.update(this.serverName)
+      // await this.mainWeightBell.update(this.serverName)
+      // await this.flakeWeightBell.update(this.serverName)
+      await Promise.all([
+        this.mainWeightBell.fetchSetting(this.serverName),
+        this.flakeWeightBell.fetchSetting(this.serverName)
+      ])
 
       if(!this.isSetReadyVoiceTips && this.mainWeightBell.accu === 0) {
         this.readyTimeoutList = setReadyVoiceTips(this.voiceTipsConfig["ready"], this.brandName)
