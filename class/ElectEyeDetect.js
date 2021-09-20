@@ -18,12 +18,14 @@ class ElectEye {
       // eyeState 有没有空字符串的可能
       this.lastSwitchTime = Date.now()
       // console.log(`eye state: ${eyeState.item}: ${eyeState.data}`)
-      this.currentState = parseInt(eyeState.data, 12)
+      this.currentState = parseInt(eyeState.data, 10)
     })
   }
 
   isStateNotChange() {
     let notChangeTime = (Date.now() - this.lastSwitchTime) / 1000 
+    
+    console.log(`${notChangeTime}, ${this.maxTime}, ${this.isTrigger}, ${this.currentState}`)
 
     if(notChangeTime > this.maxTime && !this.isTrigger) {
       this.isTrigger = true
@@ -76,11 +78,12 @@ class ElectEyeDetect {
     if(!this.isInit) await this.init()
 
     for (let [name, electEye] of Object.entries(this.electEyeCol)) {
-      console.log(`${name}: ${electEye.currentState} 持续时间：${(Date.now() - electEye.lastSwitchTime) / 1000}`)
+      // console.log(`${name}: ${electEye.currentState} 持续时间：${(Date.now() - electEye.lastSwitchTime) / 1000}`)
+      process.stdout.write(`${name}: `)
       
-      if(electEye.isStateNotChange(10)) {
+      if(electEye.isStateNotChange()) {
         console.log(`${this.location} ${name} 电眼状态长时间不变, 请注意`)
-        // speakTwice(`${this.location} ${name} 电眼状态长时间不变, 请注意`)
+        speakTwice(`${this.location} ${name} 电眼状态长时间不变, 请注意`)
       }
     }
   }
