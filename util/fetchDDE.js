@@ -23,14 +23,23 @@ async function fetchDDE (serverName, itemName, returnType) {
 }
 
 async function request(serverName, itemName) {
-    let temp
+    try {
+        let temp
 
-    for (let i = 0; i < 4; i++) {
-        temp = await connectingServers[serverName].request('tagname', itemName)
-        if (temp !== "") break
+        for (let i = 0; i < 4; i++) {
+            temp = await connectingServers[serverName].request('tagname', itemName)
+            if (temp !== "") break
+        }
+        
+        return temp
+    } catch(err) {
+
+        if (err.message === "Not connected") {
+            delete connectingServers[serverName]
+        }
+
+        throw err
     }
-    
-    return temp
 }
 
 

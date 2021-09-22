@@ -9,6 +9,8 @@ async function checkMoistureMeter(location, serverName, config) {
       fetchDDE(serverName, config[name]['itemName'][1], 'string'),
     ])
 
+    console.log(`${name}: ${temp1} ${temp2}`)
+
     if (temp1 !== temp2) {
       console.log(`${location}, ${name} 状态异常`)
       speakTwice(`${location}, ${name} 状态异常`)
