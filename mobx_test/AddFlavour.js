@@ -1,7 +1,7 @@
-'use strict'
+//'use strict'
 
 const config = require("../mobx_test_config/AddFlavour.json")
-const { makeAutoObservable, action, reaction, override, autorun } = require("mobx")
+const { makeAutoObservable, action, reaction, override, autorun, runInAction } = require("mobx")
 const { setAdvise, fetchDDE } = require("../util/fetchDDE")
 const { logger } = require("../util/loggerHelper")
 const { speakTwice } = require("../util/speak")
@@ -50,20 +50,28 @@ class AddFlavour {
         }
       }
     )
+
+    autorun(() => {
+      console.log("addFlavour 加料")
+      console.log(this.state, this.id)
+      console.log("===========================")
+    })
   }
 
-  *init() {
+  async init() {
     // init advise
-    yield initAdviseData(config[this.line]["advise"])
-    yield this.mainWeighBell.init(this.serverName)
-    yield this.cabinet.init(this.serverName)
+    await Promise.all([
+      this.initAdviseData(config[this.line]["advise"]),
+      this.mainWeighBell.init(this.serverName),
+      this.cabinet.init(this.serverName)
+    ])
   }
 
-  *reConnect() {
+  async reConnect() {
 
   }
 
-  *initAdviseData(adviseConfigMap) {
+  async initAdviseData(adviseConfigMap) {
     for(const[key, value] of Object.entries(adviseConfigMap)) {
       logger.info(`init advise -> ${key}: ${value}`)
       
@@ -76,12 +84,14 @@ class AddFlavour {
           device = new Device(this.line, key, value.maxTime, value.itemName)
         }
 
-        yield device.init(this.serverName)
-
-        deviceList.push(device)
+        await device.init(this.serverName)
+        
+        runInAction(() => {
+          this.deviceList = this.deviceList.concat([device])
+        })
 
       } else if(value.type === "id") {
-        yield setAdvise(this.serverName, value.itemName, action(state => {
+        await setAdvise(this.serverName, value.itemName, action(state => {
           logger.info(`${key} value change to ${state.data}.`)
           this.id = state.data.slice(0, -3)
         }))
@@ -89,40 +99,50 @@ class AddFlavour {
     }
   }
 
-  *reConnectAdviseData() {
+  async reConnectAdviseData() {
 
   }
 
-  *update() {
+  async update() {
 
     this.refreshUpdateCount()
 
     if(this.state === "准备") {
-      yield this.cabinet.updateCabinetInfo(this.serverName)
-      yield this.mainWeighBell.fetchSetting(this.serverName)
+      await this.cabinet.updateCabinetInfo(this.serverName)
+      await this.mainWeighBell.fetchSetting(this.serverName)
 
-      if (this.cabinet.state === "监控") {
-        this.state = "准备完成"
-      }
+      runInAction(() => {
+        if (this.cabinet.state === "监控") {
+          this.state = "准备完成"
+        }
+      })
       // 检查参数
       //
 
     }else if(this.state === "准备完成" || this.state === "停止") {
-      if(this.mainWeighBell.state === "运行正常") {
-        this.state = "监控"
-      }
+
+      await this.mainWeighBell.update(this.serverName)
+
+      runInAction(() => {
+        if(this.mainWeighBell.state === "运行正常") {
+          this.state = "监控"
+        }
+      })
+      
     }else if(this.state === "监控") {
       // 检查 device 状态持续时间是否符合要求
       this.checkDeviceState()
 
       // 先更新电子秤, 再检查半柜状态
-      yield this.mainWeighBell.update(this.serverName)
+      await this.mainWeighBell.update(this.serverName)
 
-      yield this.cabinet.checkHalfEyeState(this.serverName, this.mainWeighBell.accu)
+      await this.cabinet.checkHalfEyeState(this.serverName, this.mainWeighBell.accu)
 
-      if(this.mainWeighBell.state === "运行停止") {
-        this.state = "停止"
-      }
+      runInAction(() => {
+        if(this.mainWeighBell.state === "运行停止") {
+          this.state = "停止"
+        }
+      })
     } 
   }
 
@@ -160,26 +180,28 @@ class Device {
     this.maxDuration = maxDuration
     this.itemName = itemName
     this.isTrigger = false
+
   }
 
-  *init(serverName) {
+  async init(serverName) {
     logger.info(`${this.deviceName}初始化`)
-    yield setAdvise(serverName, this.itemName, action(state => {
-      logger.info(`${this.deviceName} state change to ${state.data}.`)
+    await setAdvise(serverName, this.itemName, action(state => {
+      // logger.info(`${this.deviceName} state change to ${state.data}.`)
       this.deviceState = state.data
       this.lastUpdateMoment = Date.now()
     }))
   }
 
-  *reConnect(serverName) {
+  async reConnect(serverName) {
     logger.info(`${this.deviceName}重启`)
-    yield this.init(serverName)
+    await this.init(serverName)
   }
 
   checkState(now) {
     let duration = (now - this.lastUpdateMoment) / 1000
+    logger.info(`${this.line} ${this.deviceName}. 状态${this.deviceState}. 持续时间${duration}`)
     if(duration > this.maxDuration && !this.isTrigger) {
-      logger.info(`${this.line} ${this.deviceName}. 状态${this.state}. 持续时间${duration}. 大于设定最大时间 ${this.maxDuration}.`)
+      logger.info(`大于设定最大时间 ${this.maxDuration}.`)
       this.isTrigger = true
     } else if(duration <= this.maxDuration) {
       this.isTrigger = false
@@ -230,9 +252,15 @@ class WeightBell {
 
     this.line = line
     this.weightBellConfig = weightBellConfig
+
+    autorun(() => {
+      console.log("weight bell 电子秤")
+      console.log(this.state, this.setting, this.real, this.accu)
+      console.log("=============================")
+    })
   }
 
-  *init(serverName) {
+  async init(serverName) {
     if(this.weightBellConfig.hasOwnProperty("electEye")) {
       this.electEye = new Device(
         this.line,
@@ -240,36 +268,42 @@ class WeightBell {
         this.weightBellConfig.electEye.maxTime, 
         this.weightBellConfig.electEye.itemName
       )
-      yield this.electEye.init(serverName)
+      await this.electEye.init(serverName)
     }
   }
 
-  *reConnect(serverName) {
-    yield this.electEye.reConnect(serverName)
+  async reConnect(serverName) {
+    await this.electEye.reConnect(serverName)
   }
 
-  *fetchSetting(serverName) {
-    this.setting = yield fetchDDE(
+  async fetchSetting(serverName) {
+    let setting = await fetchDDE(
       serverName, 
       this.weightBellConfig.setting.itemName, 
       this.weightBellConfig.setting.valueType
     )
+
+    runInAction(() => this.setting = setting)
   }
 
-  *fetchAccu(serverName) {
-    this.accu = yield fetchDDE(
+  async fetchAccu(serverName) {
+    let accu = await fetchDDE(
       serverName, 
       this.weightBellConfig.accu.itemName, 
       this.weightBellConfig.accu.valueType
     )
+
+    runInAction(() => this.accu = accu)
   }
 
-  *fetchReal(serverName) {
-    this.real = yield fetchDDE(
+  async fetchReal(serverName) {
+    let real = await fetchDDE(
       serverName, 
       this.weightBellConfig.real.itemName, 
       this.weightBellConfig.real.valueType
     )
+
+    runInAction(() => this.real = real)
   }
 
   get state() {
@@ -284,9 +318,9 @@ class WeightBell {
     }
   }
 
-  *update(serverName) {
-    yield this.fetchReal(serverName)
-    yield this.fetchAccu(serverName)
+  async update(serverName) {
+    await this.fetchReal(serverName)
+    await this.fetchAccu(serverName)
 
     if (this.state === "运行正常" || this.state === "运行波动") {
       this.electEye.checkState(Date.now())
@@ -315,7 +349,7 @@ class Cabinet {
     reaction(
       () => this.outputNr,
       () => {
-        if(this.cabinetConig.hasOwnProperty(this.outputNr)) {
+        if(this.cabinetConfig.hasOwnProperty(this.outputNr)) {
           if (this.state === "监控") {
             logger.info(`监控状态下, 出柜号发生更换`)
           }
@@ -324,62 +358,77 @@ class Cabinet {
         }
       }
     )
-  }
 
-  *init(serverName) {
-    yield setAdvise(serverName, this.cabinetConig["outputNr"].itemName, state => {
-      logger.info(`cabinet output Nr change to ${state.data}.`)
-      this.outputNr = state.data
+    autorun(() => {
+      console.log("cabinet 出柜")
+      console.log(this.state, this.total, this.outputNr)
+      console.log("===========================")
     })
   }
 
-  *reConnect(serverName) {
-    yield this.init(serverName)
+  async init(serverName) {
+    await setAdvise(serverName, this.cabinetConfig["outputNr"].itemName, action(state => {
+      // logger.info(`cabinet output Nr change to ${state.data}.`)
+      this.outputNr = parseInt(state.data, 10)
+    }))
   }
 
-  *updateCabinetInfo(serverName) {
+  async reConnect(serverName) {
+    await this.init(serverName)
+  }
+
+  async updateCabinetInfo(serverName) {
     if (this.state === "获取信息") {
-      this.total = yield fetchDDE(
+      // console.log(this.outputNr, serverName, this.cabinetConfig[this.outputNr]["total"].itemName, this.cabinetConfig[this.outputNr]["total"].valueType)
+      let total = await fetchDDE(
         serverName,
-        this.config[this.outputNr]["total"].itemName,
-        this.config[this.outputNr]["total"].valueType
+        this.cabinetConfig[this.outputNr]["total"].itemName,
+        this.cabinetConfig[this.outputNr]["total"].valueType
       )
       
-      this.state = "监控"
-
+      runInAction(() => {
+        this.total = total
+        this.state = "监控"
+      })
+      
       // 检查出柜频率
-      yield this.checkOutputFreqSetting()
+      await this.checkOutputFreqSetting()
     } 
   }
 
-  *checkOutputFreqSetting() {
+  async checkOutputFreqSetting() {
     // 
   }
 
-  *checkHalfEyeState(serverName, weightBellAccu) {
-    if(this.state === "监控" && this.total - weightBellAccu < this.cabinetConig[this.outputNr].reference.diff) {
+  async checkHalfEyeState(serverName, weightBellAccu) {
+    if(this.state === "监控" && this.total - weightBellAccu < this.cabinetConfig[this.outputNr].reference.diff) {
       
-      let halfEyeState = yield fetchDDE(
+      let halfEyeState = await fetchDDE(
         serverName, 
-        this.config[this.outputNr]["halfEye"].itemName,
-        this.config[this.outputNr]["halfEye"].valueType,
+        this.cabinetConfig[this.outputNr]["halfEye"].itemName,
+        this.cabinetConfig[this.outputNr]["halfEye"].valueType,
       )
       
+      logger.info(`halfEyeState: ${halfEyeState}`)
+
       if(halfEyeState === 1) {
         logger.info(`${this.line} 加料出柜未转高速`)
       }
 
-      this.state = "完成"
+      runInAction(() => this.state = "完成")
     }
   }
 }
 
-function *test() {
+
+async function main () {
   let addFlavourMon = new AddFlavour("六四加料")
 
-  yield addFlavourMon.init()
+  await addFlavourMon.init()
 
-  setInterval(addFlavourMon.update, 1000 * 10)
+  setInterval(() => addFlavourMon.update(), 1000 * 10)
 }
 
-test()
+
+main()
+
