@@ -9,6 +9,7 @@ const Cabinet = require('./Cabinet')
 const WeightBell = require('./WeightBell')
 const { Device } = require('./Device')
 const { genAddFlavourState } = require('./UI')
+const { checkPara } = require('../util/checkPara2')
 
 /*
 加料监控状态
@@ -125,14 +126,16 @@ class AddFlavour {
       await this.cabinet.updateCabinetInfo(this.serverName)
       await this.mainWeightBell.fetchSetting(this.serverName)
 
+      // 检查参数
+      // checkPara()
+      await checkPara(this.line, this.serverName, config[this.line]["para"])
+
       runInAction(() => {
         if (this.cabinet.state === "监控") {
           this.state = "准备完成"
         }
       })
-      // 检查参数
-      //
-
+      
     }else if(this.state === "准备完成" || this.state === "停止") {
 
       await this.mainWeightBell.update(this.serverName)

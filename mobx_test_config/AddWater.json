@@ -14,13 +14,13 @@
         "itemName": "Galaxy:ZY2KT.Topic_ZS6.FT_DP1_M1_STATE",
         "type": "device",
         "maxTime": 90,
-        "detectState": "33"
+        "detectState": 33
       },
       "切片出口电眼": {
         "itemName": "Galaxy:ZY2KT.Topic_ZS6.FT_DP5_B1_1",
         "type": "device",
         "maxTime": 20,
-        "detectState": "0"
+        "detectState": 0
       }
     },
     "weightBell": {
@@ -42,25 +42,25 @@
           "itemName": "Galaxy:ZY2KT.Topic_ZS6.FT_DP5_B1_2",
           "type": "device",
           "maxTime": 20,
-          "detectState": "0"
+          "detectState": 0
         }
       },
       "薄片秤": {
         "setting": {
-          "itemName": "Galaxy:ZY2_YPSpice_JK.Balance_YX227.FluxSP",
+          "itemName": "Galaxy:ZY2_YPCylinder_JK.ZY2_NewPart.ZY2_BP.BPBalance207.FluxSP",
           "valueType": "int"
         },
         "accu": {
-          "itemName": "Galaxy:ZY2_YPSpice_JK.Balance_YX227.Total",
+          "itemName": "Galaxy:ZY2_YPCylinder_JK.ZY2_NewPart.ZY2_BP.BPBalance207.Total",
           "valueType": "int"
         },
         "real": {
-          "itemName": "Galaxy:ZY2_YPSpice_JK.Balance_YX227.Flux",
+          "itemName": "Galaxy:ZY2_YPCylinder_JK.ZY2_NewPart.ZY2_BP.BPBalance207.Flux",
           "valueType": "int"
         },
         "electEye": {
           "name":"定量管高电眼",
-          "itemName": "Galaxy:ZY2_YPOutSilo_JK.Limit_YX226.High",
+          "itemName": "Galaxy:ZY2_YPCylinder_JK.ZY2_NewPart.ZY2_BP.Feed205.Switch.High",
           "type": "device",
           "maxTime": 40
         }

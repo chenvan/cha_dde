@@ -20,7 +20,7 @@ function genDeviceState(device) {
 
   if(device.specifyState !== undefined) {
     output += `(${device.specifyState} ${device.deviceState}) `
-    output += device.specifyState === device.deviceState ? `${device.maxDuration} ${symbol} ${interval}\n` : "\n"
+    output += device.specifyState === device.deviceState ? `${device.maxDuration} ${symbol} ${interval}\n` : `\n`
   } else {
     output += `(${device.deviceState}) ${device.maxDuration} ${symbol} ${interval}\n` 
   }

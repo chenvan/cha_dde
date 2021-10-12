@@ -10,5 +10,7 @@
   "Galaxy:rHN_Z6.HN6.Z6_ZCBC_CurrBatchNo": "2201SSJD##001   ",
   "Galaxy:ZY2_YPCylinder_JK.ProductUnit.Batch_Now": "2201SSJD##001   ",
   "Galaxy:rHN_Z6.HN6.Z6_ZCBC_DB1Value_1": 6400,
-  "Galaxy:rHN_Z6.HN6.Z6_ZCBC_DB1Value_2": 6400
+  "Galaxy:rHN_Z6.HN6.Z6_ZCBC_DB1Value_2": 6400,
+  "Galaxy:ZY2_YPCylinder_JK.ZY2_NewPart.ZY2_BP.BPBalance207.FluxSP": 500,
+  "Galaxy:ZY2_YPCylinder_JK.ZY2_NewPart.ZY2_BP.BPBalance207.Flux": 500
 }

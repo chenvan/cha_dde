@@ -3,6 +3,7 @@
 const { makeObservable, action, reaction, override, autorun, runInAction, observable } = require("mobx")
 const { setAdvise } = require("../util/fetchDDE")
 const { logger } = require("../util/loggerHelper")
+const { speakTwice } = require("../util/speak")
 
 class Device {
   line
@@ -39,7 +40,7 @@ class Device {
     logger.info(`${this.deviceName}初始化`)
     await setAdvise(serverName, this.itemName, action(state => {
       // logger.info(`${this.deviceName} state change to ${state.data}.`)
-      this.deviceState = state.data
+      this.deviceState = parseInt(state.data, 10)
       this.lastUpdateMoment = Date.now()
     }))
   }
@@ -53,7 +54,8 @@ class Device {
     let duration = (now - this.lastUpdateMoment) / 1000
     logger.info(`${this.line} ${this.deviceName}. 状态${this.deviceState}. 持续时间${duration}`)
     if(duration > this.maxDuration && !this.isTrigger) {
-      logger.info(`大于设定最大时间 ${this.maxDuration}.`)
+      logger.info(`${this.deviceName} 状态长时间不变.`)
+      speakTwice(`${this.deviceName} 状态长时间不变.`)
       this.isTrigger = true
     } else if(duration <= this.maxDuration) {
       this.isTrigger = false

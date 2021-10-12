@@ -3,6 +3,7 @@
 const { makeAutoObservable, action, reaction, override, autorun, runInAction } = require("mobx")
 const { setAdvise, fetchDDE } = require("../util/fetchDDE")
 const { logger } = require("../util/loggerHelper")
+const { speakTwice } = require("../util/speak")
 
 /*
 Cabinet 监控柜的半柜电眼是否正常
@@ -90,6 +91,7 @@ class Cabinet {
 
       if(halfEyeState === 1) {
         logger.info(`${this.line} 加料出柜未转高速`)
+        speakTwice(`${this.line} 加料出柜未转高速`)
       }
 
       runInAction(() => this.state = "完成")
