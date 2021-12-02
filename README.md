@@ -1,4 +1,27 @@
 # 框架
+pub / sub 的框架
+
+### pub 结构
+数据源, 获得数据的方式, trigger 的条件
+### sub 结构
+
+
+
+### class 的结构
+
+把功能分拆成class
+
+举例监控出柜
+
+换柜时, 先检查高频和低频的出柜设置
+监控下游电子秤的累计量, 当累计量与柜的储量达到一定差值的时候, 检查半柜电眼
+
+CabinetOutputMonitor
+advice serverName & itemName
+
+CabinetInfo
+半柜电眼
+
 10 个 NetDDE Server
 
 如何统一数据
@@ -15,6 +38,9 @@ advice 的数据
 筒的状态, 语音提示, 分能检测的部分和不能检测的部分
 
 转批时数据的检测(某些容易忘记的参数是否有设)
+
+
+
 # 问题
 ### 启动多个client
 把连接不成功的放进一个 array 里, 然后重复连接
