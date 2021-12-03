@@ -1,40 +1,44 @@
-require('winax')
-var voiceObj = new ActiveXObject("Sapi.SpVoice")
+// require('winax')
+// var voiceObj = new ActiveXObject("Sapi.SpVoice")
 
 const process = require('process')
-// const { fetchDDE, disconnectAllClients } = require('./fetchDDE')
+const { SwitchData, eventEmitter } = require('./DataType')
+const monCofigList = require('./config/monitorData.json')
 
+let monDataList = []
 
-async function main() {
-  console.log('HMI3: ', await fetchDDE('VMGZZSHMI3', '$second'))
-  console.log('HMI6: ', await fetchDDE('VMGZZSHMI6', '$second'))
-}
-
-
-function hookCabinetOutputService() {
-  // read json file to know how many cabinet output
+function main() {
+  // console.log('HMI3: ', await fetchDDE('VMGZZSHMI3', '$second'))
+  // console.log('HMI6: ', await fetchDDE('VMGZZSHMI6', '$second'))
   
-  // advice the key data item, which is output cabinet NO. and call back function for data item change
+  monDataList = monCofigList.map(monCofig => {
+    if(monCofig.dataType == "SwitchData") {
+      return new SwitchData(monCofig.lineName, monCofig.serverName, monCofig.itemName)
+    } else {
+      return null
+    }
+  })
 
-  // you could set many advice, but you only have one client one callback function
 
+  setInterval(update, 60 * 1000)
 }
 
-setInterval(main, 1500)
+function update() {
+  monDataList.forEach(monData => {
+    if(monData !== null) {
+      monData.update()
+    }
+  })
+}
+
+eventEmitter.on('', () => {
+
+})
+
+main()
 
 process.on("SIGINT", async () => {
   // console.log("before exit")
   await disconnectAllClients()
   process.exit()
 })
-
-
-//   // 使用DDE Query 可以知道CF_TEXT传送的编码是GBK, 但是接收到的编码却不是
-//   // 因此修改了 NetDDE 少部分代码
-
-
-
-
-
-
-
