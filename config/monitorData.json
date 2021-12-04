@@ -1,14 +1,14 @@
 {
   "64暂存柜出柜号": {
-    "serverName": "",
-    "itemName": "",
+    "serverName": "VMGZZSHMI3",
+    "itemName": "Galaxy:ZY2_YPSpice_JK.ProductUnit.SLOut1_Now",
     "dataType": "SwitchData",
     "eventName": "换柜",
     "monKey": "64暂存柜出料"
   },
   "64贮叶柜出柜号": {
-    "serverName": "",
-    "itemName": "",
+    "serverName": "VMGZZSHMI6",
+    "itemName": "Galaxy:ZY3_OutSilo1_JK.ProductUnit.SLOut1_Now",
     "dataType": "SwitchData",
     "eventName": "换柜",
     "monKey": "64贮叶柜出料"

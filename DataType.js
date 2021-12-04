@@ -11,12 +11,14 @@ class SwitchData {
     this.monKey = monKey
   }
 
-  update() {
+  async update() {
     let temp = this.currentValue
     try {
-      this.currentValue = fetchDDE(this.serverName, this.itemName)
+      let fetchData = await fetchDDE(this.serverName, this.itemName)
+      this.currentValue = parseInt(fetchData, 10)
       this.lastValue = temp
       if (this.currentValue !== this.lastValue) {
+        console.log(`trigger: ${fetchData} -> ${this.currentValue} ${this.lastValue}`)
         eventEmitter.emit(this.eventName, this.currentValue, this.monKey)
       }
     } catch (err) {
@@ -36,17 +38,27 @@ class CabinetOutputData {
     this.cabinetOutputNr = cabinetOutputNr
     this.diff = diff
     this.alreadyEmit = false
-    this.cabinetTotal = await fetchDDE(serverName, cabinetTotalItemName)
-
-    checkOutputFreq(inModeItemName,highFreqSettingItemName, lowFreqSettingItemName)
+    this.initCabinetTotal = false
+    this.cabinetTotalItemName = cabinetTotalItemName
+    
+    this.checkOutputFreq(inModeItemName,highFreqSettingItemName, lowFreqSettingItemName)
   }
 
-  update() {
+  async update() {
     try {
-      let weightAcc = fetchDDE(this.serverName, this.weighAccItemName)
+      
+      if (!this.initCabinetTotal) {
+        this.cabinetTotal = parseInt(await fetchDDE(this.serverName, this.cabinetTotalItemName), 10)
+        this.initCabinetTotal = true
+      }
+
+      let weightAcc = parseInt(await fetchDDE(this.serverName, this.weighAccItemName), 10)
+
+      // console.log(`${this.cabinetTotal} - ${weightAcc} = ${this.cabinetTotal - weightAcc}`)
+
       if (this.cabinetTotal - weightAcc < this.diff && !this.alreadyEmit) {
         // eventEmitter.emit('CabinetHalfEye', this.lineName, this.cabinetOutputNr)
-        console.log(`${this.location} ${this.cabinetOutputNr} total less than ${this.diff}`)
+        console.log(`${this.location} ${this.cabinetOutputNr}: ${this.cabinetTotal} - ${weightAcc} < ${this.diff}`)
         this.alreadyEmit = true
       }
     } catch (err) {
@@ -61,8 +73,9 @@ class CabinetOutputData {
       fetchDDE(this.serverName, lowFreqSettingItemName)
     ])
 
-    console.log(inMode, highFreqSetting, lowFreqSetting)
+    console.log(`${this.location} ${this.cabinetOutputNr}: `, inMode, highFreqSetting, lowFreqSetting)
   }
+
 }
 
 module.exports = {
