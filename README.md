@@ -30,8 +30,11 @@
 
 
 
-
-
+# ?
+1 换柜触发了 event
+换柜的 event name 是一样的吗
+2 需要出柜号, 生产线, 地点这些数据, 然后从 config 中获得 serverName, ItemName, 生成其他数据, 放到 monDataDict 中
+生产线和地点可以结合成一个 key
 
 10 个 NetDDE Server
 
