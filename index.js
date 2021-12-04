@@ -1,40 +1,49 @@
-require('winax')
-var voiceObj = new ActiveXObject("Sapi.SpVoice")
+// require('winax')
+// var voiceObj = new ActiveXObject("Sapi.SpVoice")
 
 const process = require('process')
-// const { fetchDDE, disconnectAllClients } = require('./fetchDDE')
+const { SwitchData, CabinetOutputData ,eventEmitter } = require('./DataType')
+const monCofigDict = require('./config/monitorData.json')
 
+let monDataDict = {}
 
-async function main() {
-  console.log('HMI3: ', await fetchDDE('VMGZZSHMI3', '$second'))
-  console.log('HMI6: ', await fetchDDE('VMGZZSHMI6', '$second'))
+function main() {
+  // console.log('HMI3: ', await fetchDDE('VMGZZSHMI3', '$second'))
+  // console.log('HMI6: ', await fetchDDE('VMGZZSHMI6', '$second'))
+
+  monDataDict = Object.keys(monCofigDict).reduce((dataDict, key) => {
+      let temp = monCofigDict[key]
+      if(temp.dataType == "SwitchData") {
+        dataDict[key] = new SwitchData(temp.serverName, temp.itemName, temp.eventName, temp.monKey)
+      }
+      return dataDict
+  }, {})
+
+  setInterval(update, 1000)
 }
 
-
-function hookCabinetOutputService() {
-  // read json file to know how many cabinet output
-  
-  // advice the key data item, which is output cabinet NO. and call back function for data item change
-
-  // you could set many advice, but you only have one client one callback function
-
+function update() {
+  Object.keys(monDataDict).forEach(key => {
+    monDataDict[key].update()
+  })
 }
 
-setInterval(main, 1500)
-
-process.on("SIGINT", async () => {
-  // console.log("before exit")
-  await disconnectAllClients()
-  process.exit()
+eventEmitter.on('换柜', (outputNr, monKey) => {
+  // use monKey to get serverName and itemName we want
+  let cabinetInfo = require('./config/cabinetInfo.json')
+  let chosenOne = cabinetInfo[monKey]
+  monDataDict[monKey] = new CabinetOutputData(
+    monKey, outputNr, chosenOne['serverName'], chosenOne['weightAccItemName'],
+    chosenOne[outputNr]['cabinetTotalItemName'], chosenOne[outputNr]['inModeItemName'],
+    chosenOne[outputNr]['highFreqSettingItemName'], chosenOne[outputNr]['lowFreqSettingItemName'],
+    chosenOne[outputNr]['diff']
+  )
 })
 
+main()
 
-//   // 使用DDE Query 可以知道CF_TEXT传送的编码是GBK, 但是接收到的编码却不是
-//   // 因此修改了 NetDDE 少部分代码
-
-
-
-
-
-
-
+// process.on("SIGINT", async () => {
+//   // console.log("before exit")
+//   await disconnectAllClients()
+//   process.exit()
+// })

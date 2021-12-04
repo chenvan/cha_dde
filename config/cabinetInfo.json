@@ -1,0 +1,80 @@
+{
+  "64暂存柜出料": {
+    "serverName": "",
+    "weightAccuItemName": "",
+    "1": {
+      "cabinetTotalItemName": "",
+      "inModeItemName": "",
+      "highFreqSettingItemName": "",
+      "lowFreqSettingItemName": "",
+      "diff": 500
+    },
+    "2": {
+      "cabinetTotalItemName": "",
+      "inModeItemName": "",
+      "highFreqSettingItemName": "",
+      "lowFreqSettingItemName": "",
+      "diff": 500
+    },
+    "3": {
+      "cabinetTotalItemName": "",
+      "inModeItemName": "",
+      "highFreqSettingItemName": "",
+      "lowFreqSettingItemName": "",
+      "diff": 500
+    },
+    "4": {
+      "cabinetTotalItemName": "",
+      "inModeItemName": "",
+      "highFreqSettingItemName": "",
+      "lowFreqSettingItemName": "",
+      "diff": 500
+    }
+  },
+  "64贮叶柜出料": {
+    "serverName": "",
+    "weightAccuItemName": "",
+    "1": {
+      "cabinetTotalItemName": "",
+      "inModeItemName": "",
+      "highFreqSettingItemName": "",
+      "lowFreqSettingItemName": "",
+      "diff": 1900
+    },
+    "2": {
+      "cabinetTotalItemName": "",
+      "inModeItemName": "",
+      "highFreqSettingItemName": "",
+      "lowFreqSettingItemName": "",
+      "diff": 1900
+    },
+    "3": {
+      "cabinetTotalItemName": "",
+      "inModeItemName": "",
+      "highFreqSettingItemName": "",
+      "lowFreqSettingItemName": "",
+      "diff": 1900
+    },
+    "4": {
+      "cabinetTotalItemName": "",
+      "inModeItemName": "",
+      "highFreqSettingItemName": "",
+      "lowFreqSettingItemName": "",
+      "diff": 1900
+    },
+    "5": {
+      "cabinetTotalItemName": "",
+      "inModeItemName": "",
+      "highFreqSettingItemName": "",
+      "lowFreqSettingItemName": "",
+      "diff": 1900
+    },
+    "6": {
+      "cabinetTotalItemName": "",
+      "inModeItemName": "",
+      "highFreqSettingItemName": "",
+      "lowFreqSettingItemName": "",
+      "diff": 1900
+    }
+  }
+}

@@ -21,21 +21,21 @@ async function fetchDDE (serverName, itemName) {
     }
 }
 
-async function advise (serverName, itemName) {
-    try {
-        if(!connectingServers.hasOwnProperty(serverName)) {
-            await connectServer(serverName)
-        }
+// async function advise (serverName, itemName) {
+//     try {
+//         if(!connectingServers.hasOwnProperty(serverName)) {
+//             await connectServer(serverName)
+//         }
 
-        connectingServers[serverName].advise('tagname', itemName, Constants.dataType.CF_TEXT)
+//         connectingServers[serverName].advise('tagname', itemName, Constants.dataType.CF_TEXT)
 
-        return connectingServers[serverName]
+//         return connectingServers[serverName]
 
-    } catch (err) {
-        console.log(err)
-        return null
-    }
-}
+//     } catch (err) {
+//         console.log(err)
+//         return null
+//     }
+// }
 
 async function connectServer(serverName) {
     if (!serverNameList.includes(serverName)) {
@@ -64,7 +64,6 @@ async function disconnectAllClients( ) {
 }
 
 module.exports = {
-    advise,
     fetchDDE,
     disconnectAllClients
 }

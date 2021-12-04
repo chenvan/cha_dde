@@ -1,0 +1,16 @@
+{
+  "64暂存柜出柜号": {
+    "serverName": "",
+    "itemName": "",
+    "dataType": "SwitchData",
+    "eventName": "换柜",
+    "monKey": "64暂存柜出料"
+  },
+  "64贮叶柜出柜号": {
+    "serverName": "",
+    "itemName": "",
+    "dataType": "SwitchData",
+    "eventName": "换柜",
+    "monKey": "64贮叶柜出料"
+  }
+}
