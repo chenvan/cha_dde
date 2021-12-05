@@ -1,5 +1,7 @@
-const { fetchDDE } = require("./fetchDDE")
+const { fetchDDE, fetchInt } = require("./fetchDDE")
+const { speakTwice } = require('./speak')
 const EventEmitter = require('events')
+
 
 const eventEmitter = new EventEmitter()
 
@@ -12,13 +14,14 @@ class SwitchData {
   }
 
   async update() {
-    let temp = this.currentValue
     try {
-      let fetchData = await fetchDDE(this.serverName, this.itemName)
-      this.currentValue = parseInt(fetchData, 10)
-      this.lastValue = temp
+      
+      let temp = await fetchInt(this.serverName, this.itemName)
+      this.lastValue = this.currentValue
+      this.currentValue = temp
+
       if (this.currentValue !== this.lastValue) {
-        console.log(`trigger: ${fetchData} -> ${this.currentValue} ${this.lastValue}`)
+        console.log(`trigger: ${this.currentValue} ${this.lastValue}`)
         eventEmitter.emit(this.eventName, this.currentValue, this.monKey)
       }
     } catch (err) {
@@ -30,16 +33,22 @@ class SwitchData {
 
 // 判断柜的重量与秤累计量的差值是否小于某个数据
 class CabinetOutputData {
-  constructor(location, cabinetOutputNr, serverName, weighAccItemName, cabinetTotalItemName,
-              inModeItemName, highFreqSettingItemName, lowFreqSettingItemName, diff) {
+  constructor(location, cabinetOutputNr, serverName, weighAccItemName, weighBatchIdItemName, 
+              cabinetTotalItemName,inModeItemName, highFreqSettingItemName, lowFreqSettingItemName, 
+              cabinetBatchIdItemName, diff) {
+
     this.location = location
+    this.cabinetOutputNr = cabinetOutputNr
     this.serverName = serverName
     this.weighAccItemName = weighAccItemName
-    this.cabinetOutputNr = cabinetOutputNr
-    this.diff = diff
-    this.alreadyEmit = false
-    this.initCabinetTotal = false
+    this.weighBatchIdItemName =weighBatchIdItemName
     this.cabinetTotalItemName = cabinetTotalItemName
+    this.cabinetBatchIdItemName = cabinetBatchIdItemName
+    this.diff = diff
+    
+    this.alreadyEmit = false
+    this.alreadyInitCabinet = false
+    this.isBatchTheSame = false
     
     this.checkOutputFreq(inModeItemName,highFreqSettingItemName, lowFreqSettingItemName)
   }
@@ -47,12 +56,24 @@ class CabinetOutputData {
   async update() {
     try {
       
-      if (!this.initCabinetTotal) {
-        this.cabinetTotal = parseInt(await fetchDDE(this.serverName, this.cabinetTotalItemName), 10)
-        this.initCabinetTotal = true
+      if (!this.alreadyInitCabinet) {
+        [this.cabinetTotal, this.cabinetBatchId] = await Promise.all([
+          fetchInt(this.serverName, this.cabinetTotalItemName),
+          fetchDDE(this.serverName, this.cabinetBatchIdItemName)
+        ])
+        this.alreadyInitCabinet = true
       }
 
-      let weightAcc = parseInt(await fetchDDE(this.serverName, this.weighAccItemName), 10)
+      if (!this.isBatchTheSame) 
+      {
+        let weightBatchId = await fetchDDE(this.serverName, this.weighBatchIdItemName)
+        
+        if (weightBatchId != this.cabinetBatchId) return
+
+        this.isBatchTheSame = true
+      }
+
+      let weightAcc = await fetchInt(this.serverName, this.weighAccItemName)
 
       // console.log(`${this.cabinetTotal} - ${weightAcc} = ${this.cabinetTotal - weightAcc}`)
 

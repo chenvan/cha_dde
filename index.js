@@ -29,14 +29,13 @@ function update() {
 eventEmitter.on('换柜', async (outputNr, monKey) => {
   // use monKey to get serverName and itemName we want
   let cabinetInfo = require('./config/cabinetInfo.json')
-  let chosenOne = cabinetInfo[monKey]
+  let chosen = cabinetInfo[monKey]
 
-  if(chosenOne.hasOwnProperty(outputNr)) {
+  if(chosen.hasOwnProperty(outputNr)) {
     monDataDict[monKey] = new CabinetOutputData(
-      monKey, outputNr, chosenOne['serverName'], chosenOne['weightAccItemName'], 
-      chosenOne[outputNr]['cabinetTotalItemName'], chosenOne[outputNr]['inModeItemName'],
-      chosenOne[outputNr]['highFreqSettingItemName'], chosenOne[outputNr]['lowFreqSettingItemName'],
-      chosenOne[outputNr]['diff']
+      monKey, outputNr, chosen['serverName'], chosen['weightAccItemName'], chosen['weightBatchIdItemName'],
+      chosen[outputNr]['cabinetTotalItemName'], chosen[outputNr]['inModeItemName'],chosen[outputNr]['highFreqSettingItemName'], 
+      chosen[outputNr]['lowFreqSettingItemName'], chosen[outputNr]['cabinetBatchIdItemName'], chosen[outputNr]['diff']
     )
   }
 })

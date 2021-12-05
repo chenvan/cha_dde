@@ -6,19 +6,11 @@ var connectingServers = {}
 
 async function fetchDDE (serverName, itemName) {
 
-    try {
-        if(!connectingServers.hasOwnProperty(serverName)) {
-            await connectServer(serverName)
-        }
-    
-        return await connectingServers[serverName].request('tagname', itemName)
-
-    } catch (err) {
-        //Error: Process interrupted
-        //Error: connect ECONNREFUSED 192.168.12.55:8888
-        console.log(err) // 一开始无法连接的 error 出现在这
-        return null
+    if(!connectingServers.hasOwnProperty(serverName)) {
+        await connectServer(serverName)
     }
+
+    return await connectingServers[serverName].request('tagname', itemName)
 }
 
 // async function advise (serverName, itemName) {
@@ -36,6 +28,16 @@ async function fetchDDE (serverName, itemName) {
 //         return null
 //     }
 // }
+
+async function fetchInt(serverName, itemName) {
+    let temp = await fetchDDE(serverName, itemName)
+
+    if (Number.isNaN(temp)) {
+        throw Error(`${temp} from ${serverName}:${itemName} is not a number`)
+    }
+
+    return parseInt(temp)
+}
 
 async function connectServer(serverName) {
     if (!serverNameList.includes(serverName)) {
@@ -65,5 +67,6 @@ async function disconnectAllClients( ) {
 
 module.exports = {
     fetchDDE,
+    fetchInt,
     disconnectAllClients
 }

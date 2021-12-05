@@ -36,16 +36,21 @@
 2 需要出柜号, 生产线, 地点这些数据, 然后从 config 中获得 serverName, ItemName, 生成其他数据, 放到 monDataDict 中
 生产线和地点可以结合成一个 key
 
-10 个 NetDDE Server
-
-如何统一数据
-
-
+# 使用 Mobx? 
 
 # 问题
 
-## 启动多个client
-把连接不成功的放进一个 array 里, 然后重复连接
+## CabinetOutputData 的 bug
+
+由于出柜和烘丝换批存在时差, CabinetOutputData 创建时读到的秤累计量是上一批的累计量, 符合提醒的条件
+把下游的批次号和柜的批次号也放到 CabinetOutputData里
+
+## netdde 返回的数据有可能是空值
+
+首先 netdde 返回的数据类型是 string
+弄一个 fetchInt 函数, 测到NaN就 throw Error
+
+fetchDDE 和 connectServer 不应该 catch error(?)
 
 ## netdde 不支持中文
 
