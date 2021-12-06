@@ -30,13 +30,13 @@ async function fetchDDE (serverName, itemName) {
 // }
 
 async function fetchInt(serverName, itemName) {
-    let temp = await fetchDDE(serverName, itemName)
+    let temp = parseInt(await fetchDDE(serverName, itemName), 10)
 
     if (Number.isNaN(temp)) {
         throw Error(`${temp} from ${serverName}:${itemName} is not a number`)
     }
 
-    return parseInt(temp)
+    return temp
 }
 
 async function connectServer(serverName) {

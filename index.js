@@ -35,7 +35,8 @@ eventEmitter.on('换柜', async (outputNr, monKey) => {
     monDataDict[monKey] = new CabinetOutputData(
       monKey, outputNr, chosen['serverName'], chosen['weightAccItemName'], chosen['weightBatchIdItemName'],
       chosen[outputNr]['cabinetTotalItemName'], chosen[outputNr]['inModeItemName'],chosen[outputNr]['highFreqSettingItemName'], 
-      chosen[outputNr]['lowFreqSettingItemName'], chosen[outputNr]['cabinetBatchIdItemName'], chosen[outputNr]['diff']
+      chosen[outputNr]['lowFreqSettingItemName'], chosen[outputNr]['cabinetBatchIdItemName'], chosen[outputNr]['diff'], 
+      chosen[outputNr]['halfEyeItemName']
     )
   }
 })

@@ -35,7 +35,7 @@ class SwitchData {
 class CabinetOutputData {
   constructor(location, cabinetOutputNr, serverName, weighAccItemName, weighBatchIdItemName, 
               cabinetTotalItemName,inModeItemName, highFreqSettingItemName, lowFreqSettingItemName, 
-              cabinetBatchIdItemName, diff) {
+              cabinetBatchIdItemName, diff, halfEyeItemName) {
 
     this.location = location
     this.cabinetOutputNr = cabinetOutputNr
@@ -45,7 +45,9 @@ class CabinetOutputData {
     this.cabinetTotalItemName = cabinetTotalItemName
     this.cabinetBatchIdItemName = cabinetBatchIdItemName
     this.diff = diff
+    this.halfEyeItemName = halfEyeItemName
     
+    this.hmiOutputNr = cabinetOutputNr - Math.floor(cabinetOutputNr / 100) * 100
     this.alreadyEmit = false
     this.alreadyInitCabinet = false
     this.isBatchTheSame = false
@@ -80,6 +82,13 @@ class CabinetOutputData {
       if (this.cabinetTotal - weightAcc < this.diff && !this.alreadyEmit) {
         // eventEmitter.emit('CabinetHalfEye', this.lineName, this.cabinetOutputNr)
         console.log(`${this.location} ${this.cabinetOutputNr}: ${this.cabinetTotal} - ${weightAcc} < ${this.diff}`)
+        
+        let halfEye = await fetchInt(this.serverName, this.halfEyeItemName)
+        
+        if (halfEye == 1) {
+          speakTwice(`${this.location}, ${this.hmiOutputNr}号柜没有转高速`)
+        }
+        
         this.alreadyEmit = true
       }
     } catch (err) {
@@ -89,12 +98,15 @@ class CabinetOutputData {
 
   async checkOutputFreq(inModeItemName,highFreqSettingItemName, lowFreqSettingItemName) {
     let [inMode, highFreqSetting, lowFreqSetting] = await Promise.all([
-      fetchDDE(this.serverName, inModeItemName),
-      fetchDDE(this.serverName, highFreqSettingItemName),
-      fetchDDE(this.serverName, lowFreqSettingItemName)
+      fetchInt(this.serverName, inModeItemName),
+      fetchInt(this.serverName, highFreqSettingItemName),
+      fetchInt(this.serverName, lowFreqSettingItemName)
     ])
 
-    console.log(`${this.location} ${this.cabinetOutputNr}: `, inMode, highFreqSetting, lowFreqSetting)
+    let temp = (this.cabinetOutputNr / 100) * 100 
+    
+    console.log(`${this.location} ${this.hmiOutputNr}: `, inMode, highFreqSetting, lowFreqSetting)
+    // speakTwice(`${this.location}, ${this.hmiOutputNr}号柜，高速频率：${highFreqSetting}, 低速频率：${lowFreqSetting}`)
   }
 
 }
