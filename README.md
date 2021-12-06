@@ -1,4 +1,40 @@
+# 需要的功能
+
+1. 出柜频率提示, 开始时的设定频率, 是否有高速
+
+2. 转批时重要参数的鉴定
+
+# 出柜频率的提示
+
+Class -> CabinetOutput
+CabinetInfo
+outputNr
+weightAccuItemName
+weightBatchIDItemName
+
 # 框架
+
+
+如何使用mobx
+把 state 放到 mobx, 然后 update state
+
+mobx 就是把 state ui action 分开来, 我们真的需要吗
+我们没有ui, 通过定时获取数据更新 state, 然后检测 state, 符合条件则触发 action
+
+
+## 定时获取的数据
+定时获取的数据分两种
+
+1.关注改变: TriggerData, 
+如出柜号, 批次号
+
+Batch Class(烘丝, 加料, 回潮)
+tName
+tId
+
+一种是关注数据, 一种是关注数据条件
+
+## 一次获取的数据
 
 ## 事件触发
 

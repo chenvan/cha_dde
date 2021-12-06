@@ -4,14 +4,32 @@ const serverNameList = ["VMGZZSHMI3", "VMGZZSHMI6"]
 
 var connectingServers = {}
 
-async function fetchDDE (serverName, itemName) {
-
+async function fetchDDE (serverName, itemName, returnType) {
     if(!connectingServers.hasOwnProperty(serverName)) {
         await connectServer(serverName)
     }
 
-    return await connectingServers[serverName].request('tagname', itemName)
+    let temp = await connectingServers[serverName].request('tagname', itemName)
+
+    if(returnType == 'int') {
+        let intTemp = parseInt(temp, 10)
+
+        if (Number.isNaN(intTemp)) throw Error(`${temp} from ${serverName}:${itemName} is not a number`)
+
+        return intTemp
+    }
+
+    return temp
 }
+
+// async function fetchDDE (serverName, itemName) {
+
+//     if(!connectingServers.hasOwnProperty(serverName)) {
+//         await connectServer(serverName)
+//     }
+
+//     return await connectingServers[serverName].request('tagname', itemName)
+// }
 
 // async function advise (serverName, itemName) {
 //     try {

@@ -1,0 +1,19 @@
+{
+  "六四加料": {
+    "serverName": "VMGZZSHMI3",
+    "traceData": {
+      "出柜号" : {
+        "ItemName": "",
+        "valueType": "int"
+      },
+      "批次": {
+        "ItemName": "",
+        "valueType": "string"
+      },
+      "筒状态": {
+        "ItemName": "",
+        "valueType": "int"
+      }
+    }
+  }
+}
