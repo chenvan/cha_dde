@@ -3,16 +3,12 @@
     "serverName": "VMGZZSHMI3",
     "traceData": {
       "出柜号" : {
-        "ItemName": "",
+        "ItemName": "Galaxy:ZY2_YPSpice_JK.ProductUnit.SLOut1_Now",
         "valueType": "int"
       },
       "批次": {
-        "ItemName": "",
+        "ItemName": "Galaxy:ZY2_YPSpice_JK.ProductUnit.Batch_Now",
         "valueType": "string"
-      },
-      "筒状态": {
-        "ItemName": "",
-        "valueType": "int"
       }
     }
   }
