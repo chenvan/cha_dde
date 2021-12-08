@@ -10,6 +10,8 @@ async function fetchDDE (serverName, itemName, returnType) {
     }
 
     let temp = await connectingServers[serverName].request('tagname', itemName)
+    
+    // console.log(`${itemName} -> ${temp}`)
 
     if(returnType == 'int') {
         let intTemp = parseInt(temp, 10)
@@ -85,6 +87,6 @@ async function disconnectAllClients( ) {
 
 module.exports = {
     fetchDDE,
-    fetchInt,
+    // fetchInt,
     disconnectAllClients
 }

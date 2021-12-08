@@ -32,15 +32,17 @@ class AddFlavourMon {
   async updateTraceData() {
     for (let key in this.traceDataCol) {
       try {
+        // console.log(this.traceDataCol[key])
         let isChange = await this.traceDataCol[key].update()
 
         if(isChange) {
           // 用静态方法检测 出柜号 是否存在 config 中
           if(key === '出柜号' && 
-              CabinetOutput.isExistOutpurNr(this.location, this.traceDataCol['key'].currentValue)) {
+              CabinetOutput.isExistOutpurNr(this.location, this.traceDataCol[key].currentValue)) {
             
             // 出柜号变更 -> 更新或创建新的 CabinetOutput 类, 并检查出柜频率
-            await this.cabinetOutput.init(this.traceDataCol['key'].currentValue)
+            // console.log(`${key} -> init cabinetOutput`)
+            await this.cabinetOutput.init(this.traceDataCol[key].currentValue)
 
           } else if(key === "批次") {
             // 如何杜绝批次为空的情况?

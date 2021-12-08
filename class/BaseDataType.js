@@ -8,9 +8,12 @@ class TraceData {
   }
 
   async update() {
+    console.log(this.serverName, this.itemName, this.valueType)
     let temp = await fetchDDE(this.serverName, this.itemName, this.valueType)
     
-    if (temp !== this.lastValue) {
+    console.log(`TraceData update: ${this.currentValue} -> ${temp}`)
+
+    if (temp !== this.currentValue) {
       this.lastValue = this.currentValue
       this.currentValue = temp
       return true
