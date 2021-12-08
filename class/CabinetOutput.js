@@ -3,26 +3,39 @@ const { speakTwice } = require('../speak')
 const cabinetConfig = require('../config/CabinetConfig.json')
 
 class CabinetInfo {
-  constructor(serverName, config) {
+  constructor(serverName) {
     this.serverName = serverName
-    this.config = config
+  }
+
+  async init(config) {
+    // 获得所出柜的信息. 总量, 低频设定, 进柜方式, diff
+
+    let lFreqSet, inMode
+
     this.diff = config.diff
     this.halfEyeItemName = config["halfEyeItemName"]
     this.isTrigger = false
-  }
 
-  async init(hmiOutputNr) {
-    // 获得所出柜的信息. 总量, 高频设定, 低频设定, 进柜方式, diff
-    [this.total, this.hFreqSet, this.lFreqSet, this.inMode] = await Promise.all([
-      fetchDDE(this.serverName, this.config['cabinetTotalItemName'], 'int'),
-      fetchDDE(this.serverName, this.config['highFreqSettingItemName'], 'int'),
-      fetchDDE(this.serverName, this.config['lowFreqSettingItemName'], 'int'),
-      fetchDDE(this.serverName, this.config['inModeItemName'], 'int'),
+    [this.total, lFreqSet, inMode] = await Promise.all([
+      fetchDDE(this.serverName, config['cabinetTotalItemName'], 'int'),
+      // fetchDDE(this.serverName, config['highFreqSettingItemName'], 'int'),
+      fetchDDE(this.serverName, config['lowFreqSettingItemName'], 'int'),
+      fetchDDE(this.serverName, config['inModeItemName'], 'int'),
     ]) 
-    // this.inMode 有可能是零
-    console.log(this.hFreqSet, this.lFreqSet, this.inMode)
-    
+
+    console.log(lFreqSet, inMode)
+
     // 检查出柜底带频率
+    if(inMode) {
+      // this.inMode 在出料尾段会变成 0
+      const { refLFreq, refTotal } = config['referSetting']
+      
+      let adjustTotal = (100 / inMode) * this.total
+      // 计算公式, 应该要和加料的秤流量关联
+       return Math.abs(lFreqSet - refTotal * refLFreq / adjustTotal) < 3 
+    }
+
+    return true
   }
 }
 
@@ -30,7 +43,8 @@ class CabinetOutput {
   constructor(location, serverName) {
     this.location = location
     this.serverName = serverName
-    this.weightAccuItemName = cabinetConfig[this.location]["weightAccuItemName"]
+    this.cabinetInfo = new CabinetInfo(serverName)
+    this.weightAccuItemName = cabinetConfig[location]["weightAccuItemName"]
     this.isMon = false
   }
 
@@ -40,9 +54,13 @@ class CabinetOutput {
   
   async init (outputNr) {
     // console.log("in cabinetoutput init")
-    this.cabinetInfo = new CabinetInfo(this.serverName, cabinetConfig[this.location][outputNr])
+    // this.cabinetInfo = new CabinetInfo(this.serverName, cabinetConfig[this.location][outputNr])
     this.hmiOutputNr = outputNr % 100
-    await this.cabinetInfo.init(this.hmiOutputNr)
+    let isLFreqSettingCorrect = await this.cabinetInfo.init(cabinetConfig[this.location][outputNr])
+
+    if(!isLFreqSettingCorrect) {
+      speakTwice(`${this.location} ${this.hmiOutputNr}号柜底带频率建议调整`)
+    }
   }
 
   async update() {

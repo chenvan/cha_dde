@@ -31,25 +31,22 @@ class AddFlavourMon {
   // 主程序间隔时间连续调用该程序
   async updateTraceData() {
     for (let key in this.traceDataCol) {
+
       try {
-        // console.log(this.traceDataCol[key])
+
         let isChange = await this.traceDataCol[key].update()
 
         if(isChange) {
-          // 用静态方法检测 出柜号 是否存在 config 中
+          // 用静态方法检测出柜号是否存在 config 中
           if(key === '出柜号' && 
               CabinetOutput.isExistOutpurNr(this.location, this.traceDataCol[key].currentValue)) {
             
             // 出柜号变更 -> 更新或创建新的 CabinetOutput 类, 并检查出柜频率
-            // console.log(`${key} -> init cabinetOutput`)
             await this.cabinetOutput.init(this.traceDataCol[key].currentValue)
 
-          } else if(key === "批次") {
-            // 如何杜绝批次为空的情况?
-
+          } else if(key === "批次" && this.traceDataCol[key].currentValue !== "") {
             // 批次变更 -> 监控出料情况, 就是 秤累计量 与 柜的总量开始进行计算
             this.cabinetOutput.isMon = true
-            
           }
         }
       } catch (err) {
