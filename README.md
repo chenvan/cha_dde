@@ -37,3 +37,7 @@ fetchDDE 和 connectServer 不应该 catch error(?)
 ## netdde 不支持中文
 
 当选择 Constants.dataType.CF_TEXT 时, 数据传输使用的编码应该是 gbk, 但是 netdde 在中间似乎把编码弄乱了, 现在暂时通过修改 src\helper.js 中的 decodeFormat 函数, 支持了中文读取. netdde 具体如何处理编码还没有弄清楚 
+
+## 更改 netdde advise 时触发的事件名字
+程序本来只用 "advise" 这一个事件名字, 现在换成 itemName
+修改 src\client\client.js 中的 _onDDEAdvise 函数

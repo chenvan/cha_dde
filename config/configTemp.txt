@@ -1,46 +1,30 @@
+64加料：
+牌号：Galaxy:ZY2_YPSpice_JK.ProductUnit.BrandName_Now
+入口水分仪状态：Galaxy:ZY2_YPSpice_JK.ProductUnit.MoistureMeter_JLQ.Read_Trim<>Galaxy:ZY2_YPSpice_JK.ProductUnit.MoistureMeter_JLQ.Write_Trim
+入口水分仪牌号：Galaxy:ZY2_YPSpice_JK.ProductUnit.MoistureMeter_JLQ.Read_BrandName
+出口水分仪状态：Galaxy:ZY2_YPSpice_JK.ProductUnit.MoistureMeter_JLH.Read_Trim<>Galaxy:ZY2_YPSpice_JK.ProductUnit.MoistureMeter_JLH.Write_Trim
+出口水分仪牌号：Galaxy:ZY2_YPSpice_JK.ProductUnit.MoistureMeter_JLH.Read_BrandName
+后仓低料位：Galaxy:ZY2_YPOutSilo_JK.Feed_YX225.Switch.Stuff
+加料筒状态:
+
 {
-  "64暂存柜出料": {
+  "64暂存柜出柜号": {
     "serverName": "VMGZZSHMI3",
-    "weightAccItemName": "Galaxy:ZY2_YPSpice_JK.Balance_YX227.Total",
-    "weightBatchIdItemName": "Galaxy:ZY2_YPSpice_JK.ProductUnit.Batch_Now",
-    "2101": {
-      "halfEyeItemName": "Galaxy:ZY2_YPCylinder_JK.CabinetIn_2101.CabInSwitch.Middle_1",
-      "cabinetTotalItemName": "Galaxy:ZY2_YPOutSilo_JK.CabinetOut_2101.CabInfo.InWeight",
-      "inModeItemName": "Galaxy:ZY2_YPOutSilo_JK.CabinetOut_2101.CabInfo.InMode",
-      "highFreqSettingItemName": "Galaxy:ZY2_YPOutSilo_JK.CabinetOut_2101.CabOut.Bottom.HighFreq",
-      "lowFreqSettingItemName": "Galaxy:ZY2_YPOutSilo_JK.CabinetOut_2101.CabOut.Bottom.LowFreq",
-      "cabinetBatchIdItemName": "Galaxy:ZY2_YPOutSilo_JK.CabinetOut_2101.CabInfo.Batch",
-      "diff": 500
-    },
-    "2102": {
-      "halfEyeItemName": "Galaxy:ZY2_YPCylinder_JK.CabinetIn_2101.CabInSwitch.Middle_2",
-      "cabinetTotalItemName": "Galaxy:ZY2_YPOutSilo_JK.CabinetOut_2102.CabInfo.InWeight",
-      "inModeItemName": "Galaxy:ZY2_YPOutSilo_JK.CabinetOut_2102.CabInfo.InMode",
-      "highFreqSettingItemName": "Galaxy:ZY2_YPOutSilo_JK.CabinetOut_2102.CabOut.Bottom.HighFreq",
-      "lowFreqSettingItemName": "Galaxy:ZY2_YPOutSilo_JK.CabinetOut_2102.CabOut.Bottom.LowFreq",
-      "cabinetBatchIdItemName": "Galaxy:ZY2_YPOutSilo_JK.CabinetOut_2102.CabInfo.Batch",
-      "diff": 500
-    },
-    "2103": {
-      "halfEyeItemName": "Galaxy:ZY2_YPCylinder_JK.CabinetIn_2103.CabInSwitch.Middle_1",
-      "cabinetTotalItemName": "Galaxy:ZY2_YPOutSilo_JK.CabinetOut_2103.CabInfo.InWeight",
-      "inModeItemName": "Galaxy:ZY2_YPOutSilo_JK.CabinetOut_2103.CabInfo.InMode",
-      "highFreqSettingItemName": "Galaxy:ZY2_YPOutSilo_JK.CabinetOut_2103.CabOut.Bottom.HighFreq",
-      "lowFreqSettingItemName": "Galaxy:ZY2_YPOutSilo_JK.CabinetOut_2103.CabOut.Bottom.LowFreq",
-      "cabinetBatchIdItemName": "Galaxy:ZY2_YPOutSilo_JK.CabinetOut_2103.CabInfo.Batch",
-      "diff": 500
-    },
-    "2104": {
-      "halfEyeItemName": "Galaxy:ZY2_YPCylinder_JK.CabinetIn_2103.CabInSwitch.Middle_2",
-      "cabinetTotalItemName": "Galaxy:ZY2_YPOutSilo_JK.CabinetOut_2104.CabInfo.InWeight",
-      "inModeItemName": "Galaxy:ZY2_YPOutSilo_JK.CabinetOut_2104.CabInfo.InMode",
-      "highFreqSettingItemName": "Galaxy:ZY2_YPOutSilo_JK.CabinetOut_2104.CabOut.Bottom.HighFreq",
-      "lowFreqSettingItemName": "Galaxy:ZY2_YPOutSilo_JK.CabinetOut_2104.CabOut.Bottom.LowFreq",
-      "cabinetBatchIdItemName": "Galaxy:ZY2_YPOutSilo_JK.CabinetOut_2104.CabInfo.Batch",
-      "diff": 500
-    }
+    "itemName": "Galaxy:ZY2_YPSpice_JK.ProductUnit.SLOut1_Now",
+    "dataType": "SwitchData",
+    "eventName": "换柜",
+    "monKey": "64暂存柜出料"
   },
-  "64贮叶柜出料": {
+  "64贮叶柜出柜号": {
+    "serverName": "VMGZZSHMI6",
+    "itemName": "Galaxy:ZY3_OutSilo1_JK.ProductUnit.SLOut1_Now",
+    "dataType": "SwitchData",
+    "eventName": "换柜",
+    "monKey": "64贮叶柜出料"
+  }
+}
+
+"64贮叶柜出料": {
     "serverName": "VMGZZSHMI6",
     "weightAccItemName": "Galaxy:rHN_Z7.HN.ZX_DB1Value_4",
     "weightBatchIdItemName": "Galaxy:rHN_Z7.HN.ZX_CurrBatch",

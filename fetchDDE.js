@@ -11,12 +11,15 @@ async function fetchDDE (serverName, itemName, returnType) {
 
     let temp = await connectingServers[serverName].request('tagname', itemName)
     
-    // console.log(`${itemName} -> ${temp}`)
+    if(temp === "") {
+        // 空字符串
+        throw Error(`${serverName}: ${itemName} -> get empty string`)
+    }
 
     if(returnType == 'int') {
         let intTemp = parseInt(temp, 10)
 
-        if (Number.isNaN(intTemp)) throw Error(`${temp} from ${serverName}:${itemName} is not a number`)
+        if (Number.isNaN(intTemp)) throw Error(`${serverName}:${itemName} -> get ${temp} is not a number`)
 
         return intTemp
     }
@@ -24,39 +27,24 @@ async function fetchDDE (serverName, itemName, returnType) {
     return temp
 }
 
-// async function fetchDDE (serverName, itemName) {
 
-//     if(!connectingServers.hasOwnProperty(serverName)) {
-//         await connectServer(serverName)
-//     }
-
-//     return await connectingServers[serverName].request('tagname', itemName)
-// }
-
-// async function advise (serverName, itemName) {
-//     try {
-//         if(!connectingServers.hasOwnProperty(serverName)) {
-//             await connectServer(serverName)
-//         }
-
-//         connectingServers[serverName].advise('tagname', itemName, Constants.dataType.CF_TEXT)
-
-//         return connectingServers[serverName]
-
-//     } catch (err) {
-//         console.log(err)
-//         return null
-//     }
-// }
-
-async function fetchInt(serverName, itemName) {
-    let temp = parseInt(await fetchDDE(serverName, itemName), 10)
-
-    if (Number.isNaN(temp)) {
-        throw Error(`${temp} from ${serverName}:${itemName} is not a number`)
+async function setAdvise(serverName, itemName, callback){
+    if(!connectingServers.hasOwnProperty(serverName)) {
+        await connectServer(serverName)
     }
 
-    return temp
+    await connectingServers[serverName].advise('tagname', itemName, Constants.dataType.CF_TEXT)
+
+    // 程序本来只使用 "advise" 这个事件名去触发数据, 我们需要改成用 itemName 作为事件名去触发数据  
+    connectingServers[serverName].on(itemName, d => callback(d.data))
+}
+
+async function cancelAdvise(serverName, itemName) {
+    if(!connectingServers.hasOwnProperty(serverName)) {
+        await connectServer(serverName)
+    }
+
+    await connectingServers[serverName].stopAdvise('tagname', itemName, Constants.dataType.CF_TEXT)
 }
 
 async function connectServer(serverName) {
@@ -87,6 +75,6 @@ async function disconnectAllClients( ) {
 
 module.exports = {
     fetchDDE,
-    // fetchInt,
+    setAdvise,
     disconnectAllClients
 }

@@ -15,17 +15,17 @@ class CabinetInfo {
     this.isTrigger = false
 
     // occure error    
-    // let lFreqSet, inMode
-    //[/*this.total, lFreqSet,*/ inMode] = await Promise.all([
-      // fetchDDE(this.serverName, config['cabinetTotalItemName'], 'int'),
+    let lFreqSet, inMode; 
+    [this.total, lFreqSet, inMode] = await Promise.all([
+      fetchDDE(this.serverName, config['cabinetTotalItemName'], 'int'),
       // fetchDDE(this.serverName, config['highFreqSettingItemName'], 'int'),
-      // fetchDDE(this.serverName, config['lowFreqSettingItemName'], 'int'),
-      //fetchDDE(this.serverName, config['inModeItemName'], 'int'),
-    //]) 
+      fetchDDE(this.serverName, config['lowFreqSettingItemName'], 'int'),
+      fetchDDE(this.serverName, config['inModeItemName'], 'int'),
+    ]) 
 
-    this.total = await fetchDDE(this.serverName, config['cabinetTotalItemName'], 'int')
-    let lFreqSet = await fetchDDE(this.serverName, config['lowFreqSettingItemName'], 'int')
-    let inMode = await fetchDDE(this.serverName, config['inModeItemName'], 'int')
+    // this.total = await fetchDDE(this.serverName, config['cabinetTotalItemName'], 'int')
+    // let lFreqSet = await fetchDDE(this.serverName, config['lowFreqSettingItemName'], 'int')
+    // let inMode = await fetchDDE(this.serverName, config['inModeItemName'], 'int')
     
     console.log(`出柜低频设置 -> ${lFreqSet}, 入柜方式 -> ${inMode}`)
 
