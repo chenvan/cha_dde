@@ -10,20 +10,24 @@ class CabinetInfo {
   async init(config) {
     // 获得所出柜的信息. 总量, 低频设定, 进柜方式, diff
 
-    let lFreqSet, inMode
-
     this.diff = config.diff
     this.halfEyeItemName = config["halfEyeItemName"]
     this.isTrigger = false
 
-    [this.total, lFreqSet, inMode] = await Promise.all([
-      fetchDDE(this.serverName, config['cabinetTotalItemName'], 'int'),
+    // occure error    
+    // let lFreqSet, inMode
+    //[/*this.total, lFreqSet,*/ inMode] = await Promise.all([
+      // fetchDDE(this.serverName, config['cabinetTotalItemName'], 'int'),
       // fetchDDE(this.serverName, config['highFreqSettingItemName'], 'int'),
-      fetchDDE(this.serverName, config['lowFreqSettingItemName'], 'int'),
-      fetchDDE(this.serverName, config['inModeItemName'], 'int'),
-    ]) 
+      // fetchDDE(this.serverName, config['lowFreqSettingItemName'], 'int'),
+      //fetchDDE(this.serverName, config['inModeItemName'], 'int'),
+    //]) 
 
-    console.log(lFreqSet, inMode)
+    this.total = await fetchDDE(this.serverName, config['cabinetTotalItemName'], 'int')
+    let lFreqSet = await fetchDDE(this.serverName, config['lowFreqSettingItemName'], 'int')
+    let inMode = await fetchDDE(this.serverName, config['inModeItemName'], 'int')
+    
+    console.log(`出柜低频设置 -> ${lFreqSet}, 入柜方式 -> ${inMode}`)
 
     // 检查出柜底带频率
     if(inMode) {
@@ -75,6 +79,8 @@ class CabinetOutput {
       this.isMon = false
 
       let halfEye = await fetchDDE(this.serverName, this.halfEyeItemName, "int")
+
+      console.log(`${this.cabinetInfo.total} - ${weightAccu} < ${this.diff} -> halfEye: ${halfEye}`)
 
       if (halfEye === 1) {
         speakTwice(`${this.location} ${this.hmiOutputNr}号柜没有转高速`)
