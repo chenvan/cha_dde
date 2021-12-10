@@ -69,23 +69,27 @@ class CabinetOutput {
   }
 
   async update() {
-    if (!this.isMon) return
-    let weightAccu = await fetchDDE(this.serverName, this.weightAccuItemName, "int")
-    
-    console.log(`${this.cabinetInfo.total} - ${weightAccu} = ${this.cabinetInfo.total-weightAccu}, ${this.cabinetInfo.diff}, ${this.cabinetInfo.isTrigger}`)
-    
-    // 当 柜的存量 - 下游秤累计量 小于 下限值, 检查半柜电眼是否被遮挡 
-    if (this.cabinetInfo.total - weightAccu < this.cabinetInfo.diff && !this.cabinetInfo.isTrigger) {
-      this.cabinetInfo.isTrigger = true
-      this.isMon = false
+    try {
+      if (!this.isMon) return
+      let weightAccu = await fetchDDE(this.serverName, this.weightAccuItemName, "int")
+      
+      console.log(`${this.cabinetInfo.total} - ${weightAccu} = ${this.cabinetInfo.total-weightAccu}, ${this.cabinetInfo.diff}, ${this.cabinetInfo.isTrigger}`)
+      
+      // 当 柜的存量 - 下游秤累计量 小于 下限值, 检查半柜电眼是否被遮挡 
+      if (this.cabinetInfo.total - weightAccu < this.cabinetInfo.diff && !this.cabinetInfo.isTrigger) {
+        this.cabinetInfo.isTrigger = true
+        this.isMon = false
 
-      let halfEye = await fetchDDE(this.serverName, this.halfEyeItemName, "int")
+        let halfEye = await fetchDDE(this.serverName, this.halfEyeItemName, "int")
 
-      console.log(`${this.cabinetInfo.total} - ${weightAccu} < ${this.diff} -> halfEye: ${halfEye}`)
+        console.log(`${this.cabinetInfo.total} - ${weightAccu} < ${this.diff} -> halfEye: ${halfEye}`)
 
-      if (halfEye === 1) {
-        speakTwice(`${this.location} ${this.hmiOutputNr}号柜没有转高速`)
+        if (halfEye === 1) {
+          speakTwice(`${this.location} ${this.hmiOutputNr}号柜没有转高速`)
+        }
       }
+    } catch (err) {
+      console.log(err)
     }
   }
 
