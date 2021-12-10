@@ -52,7 +52,7 @@ class AddFlavourMon {
             this.cabinetOutput.isMon = true
 
             let brandName = await fetchDDE(this.serverName, 'Galaxy:ZY2_YPSpice_JK.ProductUnit.BrandName_Now', 'string')
-            console(`牌号 -> ${brandName}`)
+            console.log(`牌号 -> ${brandName}`)
           } else if(key === '筒状态') {
             // 筒状态转为生产时 
             // 1.触发语音

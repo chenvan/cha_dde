@@ -9,7 +9,7 @@ class CabinetInfo {
 
   async init(config) {
     // 获得所出柜的信息. 总量, 低频设定, 进柜方式, diff
-
+    // console.log(config.diff)
     this.diff = config.diff
     this.halfEyeItemName = config["halfEyeItemName"]
     this.isTrigger = false
@@ -60,6 +60,7 @@ class CabinetOutput {
     // console.log("in cabinetoutput init")
     // this.cabinetInfo = new CabinetInfo(this.serverName, cabinetConfig[this.location][outputNr])
     this.hmiOutputNr = outputNr % 100
+    
     let isLFreqSettingCorrect = await this.cabinetInfo.init(cabinetConfig[this.location][outputNr])
 
     if(!isLFreqSettingCorrect) {
@@ -71,10 +72,10 @@ class CabinetOutput {
     if (!this.isMon) return
     let weightAccu = await fetchDDE(this.serverName, this.weightAccuItemName, "int")
     
-    console.log(weightAccu)
+    console.log(`${this.cabinetInfo.total} - ${weightAccu} = ${this.cabinetInfo.total-weightAccu}, ${this.cabinetInfo.diff}, ${this.cabinetInfo.isTrigger}`)
     
     // 当 柜的存量 - 下游秤累计量 小于 下限值, 检查半柜电眼是否被遮挡 
-    if (this.cabinetInfo.total - weightAccu < this.diff && !this.cabinetInfo.isTrigger) {
+    if (this.cabinetInfo.total - weightAccu < this.cabinetInfo.diff && !this.cabinetInfo.isTrigger) {
       this.cabinetInfo.isTrigger = true
       this.isMon = false
 

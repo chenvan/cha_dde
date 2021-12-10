@@ -8,7 +8,7 @@
       "highFreqSettingItemName": "Galaxy:ZY2_YPOutSilo_JK.CabinetOut_2101.CabOut.Bottom.HighFreq",
       "lowFreqSettingItemName": "Galaxy:ZY2_YPOutSilo_JK.CabinetOut_2101.CabOut.Bottom.LowFreq",
       "cabinetBatchIdItemName": "Galaxy:ZY2_YPOutSilo_JK.CabinetOut_2101.CabInfo.Batch",
-      "diff": 500,
+      "diff": 450,
       "referSetting": {
         "refLFreq": 21,
         "refTotal": 6800
@@ -21,7 +21,7 @@
       "highFreqSettingItemName": "Galaxy:ZY2_YPOutSilo_JK.CabinetOut_2102.CabOut.Bottom.HighFreq",
       "lowFreqSettingItemName": "Galaxy:ZY2_YPOutSilo_JK.CabinetOut_2102.CabOut.Bottom.LowFreq",
       "cabinetBatchIdItemName": "Galaxy:ZY2_YPOutSilo_JK.CabinetOut_2102.CabInfo.Batch",
-      "diff": 500,
+      "diff": 450,
       "referSetting": {
         "refLFreq": 21,
         "refTotal": 6800
@@ -34,7 +34,7 @@
       "highFreqSettingItemName": "Galaxy:ZY2_YPOutSilo_JK.CabinetOut_2103.CabOut.Bottom.HighFreq",
       "lowFreqSettingItemName": "Galaxy:ZY2_YPOutSilo_JK.CabinetOut_2103.CabOut.Bottom.LowFreq",
       "cabinetBatchIdItemName": "Galaxy:ZY2_YPOutSilo_JK.CabinetOut_2103.CabInfo.Batch",
-      "diff": 500,
+      "diff": 450,
       "referSetting": {
         "refLFreq": 21,
         "refTotal": 6800
@@ -47,7 +47,7 @@
       "highFreqSettingItemName": "Galaxy:ZY2_YPOutSilo_JK.CabinetOut_2104.CabOut.Bottom.HighFreq",
       "lowFreqSettingItemName": "Galaxy:ZY2_YPOutSilo_JK.CabinetOut_2104.CabOut.Bottom.LowFreq",
       "cabinetBatchIdItemName": "Galaxy:ZY2_YPOutSilo_JK.CabinetOut_2104.CabInfo.Batch",
-      "diff": 500,
+      "diff": 450,
       "referSetting": {
         "refLFreq": 21,
         "refTotal": 6800
