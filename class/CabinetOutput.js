@@ -80,9 +80,9 @@ class CabinetOutput {
         this.cabinetInfo.isTrigger = true
         this.isMon = false
 
-        let halfEye = await fetchDDE(this.serverName, this.halfEyeItemName, "int")
+        let halfEye = await fetchDDE(this.serverName, this.cabinetInfo.halfEyeItemName, "int")
 
-        console.log(`${this.cabinetInfo.total} - ${weightAccu} < ${this.diff} -> halfEye: ${halfEye}`)
+        console.log(`${this.cabinetInfo.total} - ${weightAccu} < ${this.cabinetInfo.diff} -> halfEye: ${halfEye}`)
 
         if (halfEye === 1) {
           speakTwice(`${this.location} ${this.hmiOutputNr}号柜没有转高速`)
