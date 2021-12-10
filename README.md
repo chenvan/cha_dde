@@ -24,6 +24,18 @@
 
 # 错误处理
 
+在哪个层面处理错误? 
+
+Mon
+## updateTraceData 使用 catch error
+traceData 出问题不会让 isChange 变成 true (好像空字符串也返回了?) 
+
+service init 出问题
+
+## updateService
+
+service update 出问题没有问题, 直接catch error, 然后等下一次
+
 # 使用 Mobx? 
 
 # 问题

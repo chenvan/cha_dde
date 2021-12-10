@@ -9,12 +9,10 @@ class CabinetInfo {
 
   async init(config) {
     // 获得所出柜的信息. 总量, 低频设定, 进柜方式, diff
-    // console.log(config.diff)
     this.diff = config.diff
     this.halfEyeItemName = config["halfEyeItemName"]
     this.isTrigger = false
-
-    // occure error    
+ 
     let lFreqSet, inMode; 
     [this.total, lFreqSet, inMode] = await Promise.all([
       fetchDDE(this.serverName, config['cabinetTotalItemName'], 'int'),
@@ -22,10 +20,6 @@ class CabinetInfo {
       fetchDDE(this.serverName, config['lowFreqSettingItemName'], 'int'),
       fetchDDE(this.serverName, config['inModeItemName'], 'int'),
     ]) 
-
-    // this.total = await fetchDDE(this.serverName, config['cabinetTotalItemName'], 'int')
-    // let lFreqSet = await fetchDDE(this.serverName, config['lowFreqSettingItemName'], 'int')
-    // let inMode = await fetchDDE(this.serverName, config['inModeItemName'], 'int')
     
     console.log(`出柜低频设置 -> ${lFreqSet}, 入柜方式 -> ${inMode}`)
 
@@ -50,6 +44,7 @@ class CabinetOutput {
     this.cabinetInfo = new CabinetInfo(serverName)
     this.weightAccuItemName = cabinetConfig[location]["weightAccuItemName"]
     this.isMon = false
+    this.isInitSuccess = false
   }
 
   static isExistOutpurNr(location, outpurNr) {
@@ -59,6 +54,7 @@ class CabinetOutput {
   async init (outputNr) {
     // console.log("in cabinetoutput init")
     // this.cabinetInfo = new CabinetInfo(this.serverName, cabinetConfig[this.location][outputNr])
+    this.outpurNr = outputNr
     this.hmiOutputNr = outputNr % 100
     
     let isLFreqSettingCorrect = await this.cabinetInfo.init(cabinetConfig[this.location][outputNr])
@@ -66,31 +62,34 @@ class CabinetOutput {
     if(!isLFreqSettingCorrect) {
       speakTwice(`${this.location} ${this.hmiOutputNr}号柜底带频率建议调整`)
     }
+
+    this.isInitSuccess = true
   }
 
   async update() {
-    try {
-      if (!this.isMon) return
-      let weightAccu = await fetchDDE(this.serverName, this.weightAccuItemName, "int")
-      
-      console.log(`${this.cabinetInfo.total} - ${weightAccu} = ${this.cabinetInfo.total-weightAccu}, ${this.cabinetInfo.diff}, ${this.cabinetInfo.isTrigger}`)
-      
-      // 当 柜的存量 - 下游秤累计量 小于 下限值, 检查半柜电眼是否被遮挡 
-      if (this.cabinetInfo.total - weightAccu < this.cabinetInfo.diff && !this.cabinetInfo.isTrigger) {
-        this.cabinetInfo.isTrigger = true
-        this.isMon = false
+  
+    if(!this.isMon) return
+    if(!this.isInitSuccess) this.init(this.outpurNr)
 
-        let halfEye = await fetchDDE(this.serverName, this.cabinetInfo.halfEyeItemName, "int")
+    let weightAccu = await fetchDDE(this.serverName, this.weightAccuItemName, "int")
+    
+    console.log(`${this.cabinetInfo.total} - ${weightAccu} => ${this.cabinetInfo.diff}; isTrigger: ${this.cabinetInfo.isTrigger}`)
+    
+    // 当 柜的存量 - 下游秤累计量 小于 下限值, 检查半柜电眼是否被遮挡 
+    if (this.cabinetInfo.total - weightAccu < this.cabinetInfo.diff && !this.cabinetInfo.isTrigger) {
 
-        console.log(`${this.cabinetInfo.total} - ${weightAccu} < ${this.cabinetInfo.diff} -> halfEye: ${halfEye}`)
+      let halfEye = await fetchDDE(this.serverName, this.cabinetInfo.halfEyeItemName, "int")
 
-        if (halfEye === 1) {
-          speakTwice(`${this.location} ${this.hmiOutputNr}号柜没有转高速`)
-        }
+      console.log(`${this.cabinetInfo.total} - ${weightAccu} < ${this.cabinetInfo.diff}; halfEye: ${halfEye}`)
+
+      if (halfEye === 1) {
+        speakTwice(`${this.location} ${this.hmiOutputNr}号柜没有转高速`)
       }
-    } catch (err) {
-      console.log(err)
+
+      this.cabinetInfo.isTrigger = true
+      this.isMon = false
     }
+    
   }
 
 }

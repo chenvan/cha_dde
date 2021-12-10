@@ -38,11 +38,15 @@ class AddFlavourMon {
         let isChange = await this.traceDataCol[key].update()
 
         if(isChange) {
+
+          console.log(`${key}'s currentValue: ${this.traceDataCol[key].currentValue}`)
+          
           // 用静态方法检测出柜号是否存在 config 中
           if(key === '出柜号' && 
               CabinetOutput.isExistOutpurNr(this.location, this.traceDataCol[key].currentValue)) {
             // 出柜号变更
             // 更新或创建新的 CabinetOutput 类, 并检查出柜频率
+            this.cabinetOutput.isInitSuccess = false
             await this.cabinetOutput.init(this.traceDataCol[key].currentValue)
 
           } else if(key === "批次" && this.traceDataCol[key].currentValue !== "") {
@@ -53,6 +57,7 @@ class AddFlavourMon {
 
             let brandName = await fetchDDE(this.serverName, 'Galaxy:ZY2_YPSpice_JK.ProductUnit.BrandName_Now', 'string')
             console.log(`牌号 -> ${brandName}`)
+          
           } else if(key === '筒状态') {
             // 筒状态转为生产时 
             // 1.触发语音
@@ -67,8 +72,12 @@ class AddFlavourMon {
 
   async updateService() {
     for(let service of this.serviceList) {
-      if (service.isMon) {
-        await service.update()
+      try {
+        if (service.isMon) {
+          await service.update()
+        }
+      } catch(err) {
+        console.log(err)
       }
     }
   }
