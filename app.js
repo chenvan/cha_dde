@@ -9,4 +9,4 @@ setInterval(() => {
   for (let mon of monList) {
     mon.updateAll()
   }
-}, 20 * 1000)
+}, 10 * 1000)

@@ -18,23 +18,29 @@
 
 更新: 更新数据, 判断数据是否发生改变
 
+## 其他
+
+### 不同 Service 的更新频率
+以 10s 作为单位间隔时间, Service 可以使用 10s, 20s, 30, 40s, 50s, 60s 的频率更新
+
+次数 3 * 4 * 5 = 60
 # 服务
 
 ## 加料单元
 
 # 错误处理
 
-在哪个层面处理错误? 
+## Mon
 
-Mon
-## updateTraceData 使用 catch error
+### updateTraceData 使用 catch error
+
 traceData 出问题不会让 isChange 变成 true (好像空字符串也返回了?) 
 
-service init 出问题
+service init 出问题会让 init 不成功. 解决方法 service 使用 isInitSuceess 来跟踪 init 是否成功, 如果不成功会在 service update 中重新进行 init
 
 ## updateService
 
-service update 出问题没有问题, 直接catch error, 然后等下一次
+service update 出问题没有问题, 把变状态的语句放到 fetch 语句之后, 这样下一次 update 还能进行
 
 # 使用 Mobx? 
 
@@ -42,10 +48,7 @@ service update 出问题没有问题, 直接catch error, 然后等下一次
 
 ## netdde 返回的数据有可能是空值
 
-首先 netdde 返回的数据类型是 string
-弄一个 fetchInt 函数, 测到NaN就 throw Error
-
-fetchDDE 和 connectServer 不应该 catch error(?)
+首先 netdde 返回的数据类型是 string, 采不到数据时会是空字符串
 
 ## netdde 不支持中文
 

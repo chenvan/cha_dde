@@ -45,6 +45,7 @@ class CabinetOutput {
     this.weightAccuItemName = cabinetConfig[location]["weightAccuItemName"]
     this.isMon = false
     this.isInitSuccess = false
+    this.updateFreq = 6
   }
 
   static isExistOutpurNr(location, outpurNr) {
@@ -66,8 +67,8 @@ class CabinetOutput {
     this.isInitSuccess = true
   }
 
-  async update() {
-  
+  async update(updateCount) {
+    if(updateCount % this.updateFreq !== 0) return
     if(!this.isMon) return
     if(!this.isInitSuccess) this.init(this.outpurNr)
 

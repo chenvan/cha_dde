@@ -8,6 +8,7 @@ class AddFlavourMon {
   constructor(location) {
 
     this.location = location
+    this.updateCount = 0
     this.serverName = AddFlavourConfig[location]['serverName']
     this.cabinetOutput = new CabinetOutput(this.location, this.serverName)
 
@@ -29,8 +30,13 @@ class AddFlavourMon {
     }, {})
   }
 
+  get count() {
+
+  }
   // 主程序间隔时间连续调用该程序
   async updateTraceData() {
+    if(this.updateCount % 6 !== 0) return 
+    
     for (let key in this.traceDataCol) {
 
       try {
@@ -73,9 +79,7 @@ class AddFlavourMon {
   async updateService() {
     for(let service of this.serviceList) {
       try {
-        if (service.isMon) {
-          await service.update()
-        }
+          await service.update(this.updateCount)    
       } catch(err) {
         console.log(err)
       }
@@ -83,8 +87,14 @@ class AddFlavourMon {
   }
 
   async updateAll() {
+    this.recordUpdateCount()
     await this.updateTraceData()
     await this.updateService()
+  }
+
+  recordUpdateCount() {
+    this.updateCount += 1
+    if (this.updateCount > 60) this.updateCount -= 60
   }
 }
 
