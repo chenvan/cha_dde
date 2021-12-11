@@ -55,6 +55,8 @@ class CabinetOutput {
   async init (outputNr) {
     // console.log("in cabinetoutput init")
     // this.cabinetInfo = new CabinetInfo(this.serverName, cabinetConfig[this.location][outputNr])
+    if(!cabinetConfig[this.location].hasOwnProperty(outputNr)) return
+    
     this.outpurNr = outputNr
     this.hmiOutputNr = outputNr % 100
     
@@ -70,25 +72,31 @@ class CabinetOutput {
   async update(updateCount) {
     if(updateCount % this.updateFreq !== 0) return
     if(!this.isMon) return
-    if(!this.isInitSuccess) this.init(this.outpurNr)
 
-    let weightAccu = await fetchDDE(this.serverName, this.weightAccuItemName, "int")
-    
-    console.log(`${this.cabinetInfo.total} - ${weightAccu} => ${this.cabinetInfo.diff}; isTrigger: ${this.cabinetInfo.isTrigger}`)
-    
-    // 当 柜的存量 - 下游秤累计量 小于 下限值, 检查半柜电眼是否被遮挡 
-    if (this.cabinetInfo.total - weightAccu < this.cabinetInfo.diff && !this.cabinetInfo.isTrigger) {
+    if(!this.isInitSuccess) {
+      await this.init(this.outpurNr)
+    }
 
-      let halfEye = await fetchDDE(this.serverName, this.cabinetInfo.halfEyeItemName, "int")
+    if(this.isInitSuccess) {
+      
+      let weightAccu = await fetchDDE(this.serverName, this.weightAccuItemName, "int")
+      
+      console.log(`${this.cabinetInfo.total} - ${weightAccu} => ${this.cabinetInfo.diff}; isTrigger: ${this.cabinetInfo.isTrigger}`)
+      
+      // 当 柜的存量 - 下游秤累计量 小于 下限值, 检查半柜电眼是否被遮挡 
+      if (this.cabinetInfo.total - weightAccu < this.cabinetInfo.diff && !this.cabinetInfo.isTrigger) {
 
-      console.log(`${this.cabinetInfo.total} - ${weightAccu} < ${this.cabinetInfo.diff}; halfEye: ${halfEye}`)
+        let halfEye = await fetchDDE(this.serverName, this.cabinetInfo.halfEyeItemName, "int")
 
-      if (halfEye === 1) {
-        speakTwice(`${this.location} ${this.hmiOutputNr}号柜没有转高速`)
+        console.log(`${this.cabinetInfo.total} - ${weightAccu} < ${this.cabinetInfo.diff}; halfEye: ${halfEye}`)
+
+        if (halfEye === 1) {
+          speakTwice(`${this.location} ${this.hmiOutputNr}号柜没有转高速`)
+        }
+
+        this.cabinetInfo.isTrigger = true
+        this.isMon = false
       }
-
-      this.cabinetInfo.isTrigger = true
-      this.isMon = false
     }
     
   }

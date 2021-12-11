@@ -9,12 +9,8 @@ async function fetchDDE (serverName, itemName, returnType) {
         await connectServer(serverName)
     }
 
-    let temp = await connectingServers[serverName].request('tagname', itemName)
-    
-    if(temp === "") {
-        // 空字符串
-        throw Error(`${serverName}: ${itemName} -> get empty string`)
-    }
+    let temp = await request(serverName, itemName)
+    // console.log(`temp value: ${temp}, length: ${temp.length}`)
 
     if(returnType == 'int') {
         let intTemp = parseInt(temp, 10)
@@ -22,6 +18,17 @@ async function fetchDDE (serverName, itemName, returnType) {
         if (Number.isNaN(intTemp)) throw Error(`${serverName}:${itemName} -> get ${temp} is not a number`)
 
         return intTemp
+    }
+
+    return temp
+}
+
+async function request(serverName, itemName) {
+    let temp
+
+    for (let i = 0; i < 3; i++) {
+        temp = await connectingServers[serverName].request('tagname', itemName)
+        if (temp !== "") break
     }
 
     return temp
