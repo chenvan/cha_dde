@@ -10,7 +10,6 @@ async function fetchDDE (serverName, itemName, returnType) {
     }
 
     let temp = await request(serverName, itemName)
-    // console.log(`temp value: ${temp}, length: ${temp.length}`)
 
     if(returnType == 'int') {
         let intTemp = parseInt(temp, 10)
@@ -26,11 +25,11 @@ async function fetchDDE (serverName, itemName, returnType) {
 async function request(serverName, itemName) {
     let temp
 
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 4; i++) {
         temp = await connectingServers[serverName].request('tagname', itemName)
         if (temp !== "") break
     }
-
+    
     return temp
 }
 

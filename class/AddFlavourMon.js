@@ -1,5 +1,6 @@
 const { TraceData } = require('./BaseDataType')
 const { CabinetOutput } = require('./CabinetOutput')
+const { ElectEyeDetect } = require('./ElectEyeDetect')
 
 const AddFlavourConfig = require('../config/AddFlavourConfig.json')
 const { fetchDDE } = require('../fetchDDE')
@@ -11,9 +12,11 @@ class AddFlavourMon {
     this.updateCount = 0
     this.serverName = AddFlavourConfig[location]['serverName']
     this.cabinetOutput = new CabinetOutput(this.location, this.serverName)
+    this.electEyeDetect = new ElectEyeDetect(this.location, this.serverName)
 
     this.serviceList = [
-      this.cabinetOutput
+      this.cabinetOutput,
+      this.electEyeDetect
     ]
 
     let traceDataConfig = AddFlavourConfig[location]["traceData"]
@@ -44,30 +47,36 @@ class AddFlavourMon {
 
           console.log(`Trace ${key}, current value : ${this.traceDataCol[key].currentValue}.`)
           
-          
           // 用静态方法检测出柜号是否存在 config 中
           if(key === '出柜号' && 
               CabinetOutput.isExistOutpurNr(this.location, this.traceDataCol[key].currentValue)) {
             // 出柜号变更
-            // 有一种情况：当柜号从 undefined 转成 0（无出柜号）的时候，cabinetOutput.init 没有完成， 同时柜号也不会出现在 cabinetOutput里面
             // 更新或创建新的 CabinetOutput 类, 并检查出柜频率
-            this.cabinetOutput.isInitSuccess = false
             await this.cabinetOutput.init(this.traceDataCol[key].currentValue)
 
-          } else if(key === "批次" && this.traceDataCol[key].currentValue.trim() !== "") {
+          } else if(key === "批次" && this.traceDataCol[key].currentValue !== "") {
             // 批次变更
             // 1.监控出料情况, 就是 秤累计量 与 柜的总量开始进行计算
             // 2.检查参数
             this.cabinetOutput.isMon = true
 
             let brandName = await fetchDDE(this.serverName, 'Galaxy:ZY2_YPSpice_JK.ProductUnit.BrandName_Now', 'string')
-            console.log(`批次值 after trim: ${this.traceDataCol[key].currentValue.trim()}.`)
+            console.log(`批次值 after replace: ${this.traceDataCol[key].currentValue.replace(/\s+/g, '')}.`)
             console.log(`牌号 -> ${brandName}.`)
           
           } else if(key === '筒状态') {
             // 筒状态转为生产时 
             // 1.触发语音
             // 2.监控后舱低料位
+
+            // 筒是生产状态的时候(或者秤有流量的时候), 电眼检查开启
+            // 当筒是其他状态(或者秤没有流量时), 电眼检查是否可以停掉
+            // 因为假设电眼检测到暂存仓提升带电眼因为有遮挡长时间亮, 而秤的流量已经掉到0关闭了检测, 那么可能会miss掉这次检测
+            // 或者我们都用 settimeout的方式, 延长10s设置 isMon
+
+            // 是否改用电子秤流量?
+            this.electEyeDetect.isMon = true
+
           }
         }
       } catch (err) {

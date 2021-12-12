@@ -16,7 +16,13 @@
 
 ## TraceData
 
-更新: 更新数据, 判断数据是否发生改变
+更新: 更新数据, 判断数据是否发生改变, 发生变化后, 做出 init 的判断
+
+### init 失败的情况: 
+
+1. init 时, fetch 不到数据 // 修改fetch 函数, 拿不到数据时至少拿多两次
+
+2. init 时, 得到错误的数据(不在 config 中)
 
 ## 其他
 
@@ -24,9 +30,17 @@
 以 10s 作为单位间隔时间, Service 可以使用 10s, 20s, 30, 40s, 50s, 60s 的频率更新
 
 次数 3 * 4 * 5 = 60
+
+### init 的情况
+首先只会在TraceData中
+
 # 服务
 
 ## 加料单元
+
+### 参数检查
+1. 水分仪检查
+2. 加料缸下限检查
 
 # 错误处理
 
@@ -34,7 +48,9 @@
 
 ### updateTraceData 使用 catch error
 
-traceData 出问题不会让 isChange 变成 true (好像空字符串也返回了?) 
+traceData 出问题不会让 isChange 变成 true 
+
+
 
 service init 出问题会让 init 不成功. 解决方法 service 使用 isInitSuceess 来跟踪 init 是否成功, 如果不成功会在 service update 中重新进行 init
 
@@ -57,3 +73,8 @@ service update 出问题没有问题, 把变状态的语句放到 fetch 语句�
 ## 更改 netdde advise 时触发的事件名字
 程序本来只用 "advise" 这一个事件名字, 现在换成 itemName
 修改 src\client\client.js 中的 _onDDEAdvise 函数
+
+## 如果 intouch 的界面是空字符串, 那么从 netDDE 返回的似乎是带三个空格的字符串, 但是使用trim的方法无法移除这些空格, 怀疑这些空格是全角空格
+
+## netdde 有时候会出现采数据丢失的情况, 丢失时返回值为空字符串
+修改 FetchDDE 函数, 如果出现丢失情况, 那么会再请求三次, 得到非空字符串立即返回. 如果三次后还是空字符串, 那么就返回这个空字符串
