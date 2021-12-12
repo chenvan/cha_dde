@@ -63,6 +63,8 @@ class AddFlavourMon {
             let brandName = await fetchDDE(this.serverName, 'Galaxy:ZY2_YPSpice_JK.ProductUnit.BrandName_Now', 'string')
             console.log(`批次值 after replace: ${this.traceDataCol[key].currentValue.replace(/\s+/g, '')}.`)
             console.log(`牌号 -> ${brandName}.`)
+
+            // check parameter
           
           } else if(key === '筒状态') {
             // 筒状态转为生产时 
