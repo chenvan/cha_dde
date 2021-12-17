@@ -5,8 +5,11 @@
 出口水分仪状态：Galaxy:ZY2_YPSpice_JK.ProductUnit.MoistureMeter_JLH.Read_Trim<>Galaxy:ZY2_YPSpice_JK.ProductUnit.MoistureMeter_JLH.Write_Trim
 出口水分仪牌号：Galaxy:ZY2_YPSpice_JK.ProductUnit.MoistureMeter_JLH.Read_BrandName
 后仓低料位：Galaxy:ZY2_YPOutSilo_JK.Feed_YX225.Switch.Stuff
-加料筒状态:
-
+后仓高料位：Galaxy:ZY2_YPOutSilo_JK.Feed_YX225.Switch.Full
+前仓高料位：Galaxy:ZY2_YPOutSilo_JK.Feed_YX225.Switch.Bottom
+加料筒生产状态: Galaxy:rZY2_JLJ.JL.SJ_STA_WORK
+加料秤有料：Galaxy:ZY2_YPCylinder_JK.ZY2_WB_YX227.STAT4_Have
+加料秤实际流量：Galaxy:ZY2_YPSpice_JK.Balance_YX227.Flux
 {
   "64暂存柜出柜号": {
     "serverName": "VMGZZSHMI3",

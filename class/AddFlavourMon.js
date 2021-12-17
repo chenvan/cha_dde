@@ -54,19 +54,19 @@ class AddFlavourMon {
             // 更新或创建新的 CabinetOutput 类, 并检查出柜频率
             await this.cabinetOutput.init(this.traceDataCol[key].currentValue)
 
-          } else if(key === "批次" && this.traceDataCol[key].currentValue !== "") {
+          } else if(key === "批次" && this.traceDataCol[key].currentValue.slice(0, -3) !== "") {
             // 批次变更
             // 1.监控出料情况, 就是 秤累计量 与 柜的总量开始进行计算
             // 2.检查参数
             this.cabinetOutput.isMon = true
 
-            let brandName = await fetchDDE(this.serverName, 'Galaxy:ZY2_YPSpice_JK.ProductUnit.BrandName_Now', 'string')
-            console.log(`批次值 after replace: ${this.traceDataCol[key].currentValue.replace(/\s+/g, '')}.`)
+            let brandNameTemp = await fetchDDE(this.serverName, 'Galaxy:ZY2_YPSpice_JK.ProductUnit.BrandName_Now', 'string')
+            let brandName = brandNameTemp.slice(0, -3)
             console.log(`牌号 -> ${brandName}.`)
 
             // check parameter
           
-          } else if(key === '筒状态') {
+          } else if(key === '筒生产状态') {
             // 筒状态转为生产时 
             // 1.触发语音
             // 2.监控后舱低料位
@@ -77,11 +77,13 @@ class AddFlavourMon {
             // 或者我们都用 settimeout的方式, 延长10s设置 isMon
 
             // 是否改用电子秤流量?
-            this.electEyeDetect.isMon = true
+            // this.electEyeDetect.isMon = true
+            console.log("%s.", this.traceDataCol[key].currentValue)
 
           }
         }
       } catch (err) {
+        console.log(key)
         console.log(err)
       }
     }
