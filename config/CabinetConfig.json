@@ -3,7 +3,8 @@
     "traceData": {
       "出柜号" : {
         "itemName": "Galaxy:ZY2_YPSpice_JK.ProductUnit.SLOut1_Now",
-        "valueType": "int"
+        "valueType": "int",
+        "classType": "switch"
       }
     },
     "weightAccuItemName": "Galaxy:ZY2_YPSpice_JK.Balance_YX227.Total",

@@ -1,9 +1,10 @@
-const { TraceData } = require('./BaseDataType')
+// const { TraceData } = require('./BaseDataType')
 const { CabinetOutput } = require('./CabinetOutput')
 const { ElectEyeDetect } = require('./ElectEyeDetect')
 
 const AddFlavourConfig = require('../config/AddFlavourConfig.json')
 const { fetchDDE } = require('../fetchDDE')
+const { initTraceData } = require('../util/initTraceData')
 
 class AddFlavourMon {
   constructor(location) {
@@ -21,16 +22,18 @@ class AddFlavourMon {
 
     let traceDataConfig = AddFlavourConfig[location]["traceData"]
 
-    this.traceDataCol = Object.keys(traceDataConfig).reduce((col, key) => {
+    this.traceDataCol = initTraceData(this.serverName, traceDataConfig)
+    
+    // this.traceDataCol = Object.keys(traceDataConfig).reduce((col, key) => {
       
-      col[key] = new TraceData(
-        this.serverName, 
-        traceDataConfig[key]['itemName'],
-        traceDataConfig[key]['valueType']
-      )
+    //   col[key] = new TraceData(
+    //     this.serverName, 
+    //     traceDataConfig[key]['itemName'],
+    //     traceDataConfig[key]['valueType']
+    //   )
 
-      return col
-    }, {})
+    //   return col
+    // }, {})
   }
 
   // 主程序间隔时间连续调用该程序

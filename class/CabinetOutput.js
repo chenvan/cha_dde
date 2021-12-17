@@ -1,7 +1,8 @@
-const { TraceData } = require('./BaseDataType')
+// const { TraceData } = require('./BaseDataType')
 const { fetchDDE } = require('../fetchDDE.js')
 const { speakTwice } = require('../speak')
 const cabinetConfig = require('../config/CabinetConfig.json')
+const { initTraceData } = require('../util/initTraceData.js')
 
 class CabinetInfo {
   constructor(serverName) {
@@ -50,16 +51,17 @@ class CabinetOutput {
 
     let traceDataConfig = cabinetConfig[location]["traceData"]
 
-    this.traceDataCol = Object.keys(traceDataConfig).reduce((col, key) => {
+    this.traceDataCol = initTraceData(this.serverName, traceDataConfig)
+    // this.traceDataCol = Object.keys(traceDataConfig).reduce((col, key) => {
       
-      col[key] = new TraceData(
-        this.serverName, 
-        traceDataConfig[key]['itemName'],
-        traceDataConfig[key]['valueType']
-      )
+    //   col[key] = new TraceData(
+    //     this.serverName, 
+    //     traceDataConfig[key]['itemName'],
+    //     traceDataConfig[key]['valueType']
+    //   )
 
-      return col
-    }, {})
+    //   return col
+    // }, {})
   }
 
   // static isExistOutpurNr(location, outpurNr) {

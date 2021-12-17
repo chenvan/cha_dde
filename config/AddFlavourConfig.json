@@ -4,7 +4,17 @@
     "traceData": {
       "批次": {
         "itemName": "Galaxy:ZY2_YPSpice_JK.ProductUnit.Batch_Now",
-        "valueType": "string"
+        "valueType": "string",
+        "classType": "switch"
+      },
+      "电子秤状态": {
+        "itemName": {
+          "setting": "",
+          "real": "Galaxy:ZY2_YPSpice_JK.Balance_YX227.Flux"
+        },
+        "valueType": "int",
+        "precis": 1,
+        "classType": "setting"
       }
     }
   }
