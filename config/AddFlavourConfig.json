@@ -2,17 +2,9 @@
   "六四加料": {
     "serverName": "VMGZZSHMI3",
     "traceData": {
-      "出柜号" : {
-        "itemName": "Galaxy:ZY2_YPSpice_JK.ProductUnit.SLOut1_Now",
-        "valueType": "int"
-      },
       "批次": {
         "itemName": "Galaxy:ZY2_YPSpice_JK.ProductUnit.Batch_Now",
         "valueType": "string"
-      },
-      "筒生产状态": {
-        "itemName": "Galaxy:rZY2_JLJ.JL.SJ_STA_WORK",
-        "valueType": "int"
       }
     }
   }

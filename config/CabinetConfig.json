@@ -1,5 +1,11 @@
 {
   "六四加料": {
+    "traceData": {
+      "出柜号" : {
+        "itemName": "Galaxy:ZY2_YPSpice_JK.ProductUnit.SLOut1_Now",
+        "valueType": "int"
+      }
+    },
     "weightAccuItemName": "Galaxy:ZY2_YPSpice_JK.Balance_YX227.Total",
     "2101": {
       "halfEyeItemName": "Galaxy:ZY2_YPCylinder_JK.CabinetIn_2101.CabInSwitch.Middle_1",

@@ -1,3 +1,4 @@
+const { TraceData } = require('./BaseDataType')
 const { fetchDDE } = require('../fetchDDE.js')
 const { speakTwice } = require('../speak')
 const cabinetConfig = require('../config/CabinetConfig.json')
@@ -5,7 +6,6 @@ const cabinetConfig = require('../config/CabinetConfig.json')
 class CabinetInfo {
   constructor(serverName) {
     this.serverName = serverName
-
   }
 
   async init(config) {
@@ -47,17 +47,48 @@ class CabinetOutput {
     this.isMon = false
     // this.isInitSuccess = false
     this.updateFreq = 6
+
+    let traceDataConfig = cabinetConfig[location]["traceData"]
+
+    this.traceDataCol = Object.keys(traceDataConfig).reduce((col, key) => {
+      
+      col[key] = new TraceData(
+        this.serverName, 
+        traceDataConfig[key]['itemName'],
+        traceDataConfig[key]['valueType']
+      )
+
+      return col
+    }, {})
   }
 
-  static isExistOutpurNr(location, outpurNr) {
-    return cabinetConfig[location].hasOwnProperty(outpurNr)
+  // static isExistOutpurNr(location, outpurNr) {
+  //   return cabinetConfig[location].hasOwnProperty(outpurNr)
+  // }
+
+  async updateTraceData() {
+    
+    for (let key in this.traceDataCol) {
+
+      let isChange = await this.traceDataCol[key].update()
+
+      if(isChange) {
+
+        console.log(`Trace ${key}, current value : ${this.traceDataCol[key].currentValue}.`)
+        
+        if(key === '出柜号' && 
+            cabinetConfig[this.location].hasOwnProperty(this.traceDataCol[key].currentValue)) {
+          // 出柜号变更
+          console.log("cabinetConfig contain this output number")
+          await this.init(this.traceDataCol[key].currentValue)
+        } 
+      }
+    }
   }
   
   async init (outputNr) {
     // console.log("in cabinetoutput init")
-    // this.cabinetInfo = new CabinetInfo(this.serverName, cabinetConfig[this.location][outputNr])
-    
-    // this.outpurNr = outputNr
+   
     this.hmiOutputNr = outputNr % 100
     
     let isLFreqSettingCorrect = await this.cabinetInfo.init(cabinetConfig[this.location][outputNr])
@@ -67,13 +98,15 @@ class CabinetOutput {
       speakTwice(`${this.location} ${this.hmiOutputNr}号柜底带频率建议调整`)
     }
 
-    this.isInitSuccess = true
+    // this.isInitSuccess = true
   }
 
   async update(updateCount) {
     if(updateCount % this.updateFreq !== 0) return
     
     if(!this.isMon) return
+
+    await this.updateTraceData()
       
     let weightAccu = await fetchDDE(this.serverName, this.weightAccuItemName, "int")
     
