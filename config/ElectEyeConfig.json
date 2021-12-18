@@ -1,10 +1,12 @@
 {
   "六四加料": {
     "前仓高料位": {
-      "itemName": "Galaxy:ZY2_YPOutSilo_JK.Feed_YX225.Switch.Bottom"
+      "itemName": "Galaxy:ZY2_YPOutSilo_JK.Feed_YX225.Switch.Bottom",
+      "maxTime": 20
     },
     "后仓高料位": {
-      "itemName": "Galaxy:ZY2_YPOutSilo_JK.Feed_YX225.Switch.Full"
+      "itemName": "Galaxy:ZY2_YPOutSilo_JK.Feed_YX225.Switch.Full",
+      "maxTIme": 40
     }
   }
 }

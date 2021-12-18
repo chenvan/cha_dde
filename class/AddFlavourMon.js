@@ -1,9 +1,8 @@
-// const { TraceData } = require('./BaseDataType')
 const { CabinetOutput } = require('./CabinetOutput')
 const { ElectEyeDetect } = require('./ElectEyeDetect')
 
 const AddFlavourConfig = require('../config/AddFlavourConfig.json')
-const { fetchDDE } = require('../fetchDDE')
+const { fetchDDE } = require('../util/fetchDDE')
 const { initTraceData } = require('../util/initTraceData')
 
 class AddFlavourMon {
@@ -44,18 +43,21 @@ class AddFlavourMon {
             // 批次变更
             // 1.监控出料情况, 就是 秤累计量 与 柜的总量开始进行计算
             // 2.检查参数
-            this.cabinetOutput.isMon = true
 
             let brandNameTemp = await fetchDDE(this.serverName, 'Galaxy:ZY2_YPSpice_JK.ProductUnit.BrandName_Now', 'string')
-            let brandName = brandNameTemp.slice(0, -3)
-            console.log(`牌号 -> ${brandName}.`)
+            this.currentBrandName = brandNameTemp.slice(0, -3)
+            console.log(`牌号 -> ${this.currentBrandName}.`)
+            
+            // 打开出料监控
+            this.cabinetOutput.isMon = true
 
-            // check parameter
-          
+            // 检查参数
+            this.checkPara()
+
           } else if (key === "电子秤状态") {
             // 筒状态转为生产时 
             // 1.触发语音
-            // 2.监控后舱低料位
+            // 2.监控电眼状态
 
             // 筒是生产状态的时候(或者秤有流量的时候), 电眼检查开启
             // 当筒是其他状态(或者秤没有流量时), 电眼检查是否可以停掉
@@ -94,6 +96,10 @@ class AddFlavourMon {
   recordUpdateCount() {
     this.updateCount += 1
     if (this.updateCount > 60) this.updateCount -= 60
+  }
+
+  checkPara() {
+
   }
 }
 

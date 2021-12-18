@@ -1,4 +1,4 @@
-const { fetchDDE } = require("../fetchDDE")
+const { fetchDDE } = require("../util/fetchDDE")
 
 class TraceData {
   constructor(serverName, itemName, valueType) {

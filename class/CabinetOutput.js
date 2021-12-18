@@ -1,8 +1,8 @@
-// const { TraceData } = require('./BaseDataType')
-const { fetchDDE } = require('../fetchDDE.js')
-const { speakTwice } = require('../speak')
-const cabinetConfig = require('../config/CabinetConfig.json')
+const { fetchDDE } = require('../util/fetchDDE.js')
+const { speakTwice } = require('../util/speak')
 const { initTraceData } = require('../util/initTraceData.js')
+
+const cabinetConfig = require('../config/CabinetConfig.json')
 
 class CabinetInfo {
   constructor(serverName) {
@@ -71,7 +71,6 @@ class CabinetOutput {
         if(key === '出柜号' && 
             cabinetConfig[this.location].hasOwnProperty(this.traceDataCol[key].currentValue)) {
           // 出柜号变更
-          console.log("cabinetConfig contain this output number")
           await this.init(this.traceDataCol[key].currentValue)
         } 
       }

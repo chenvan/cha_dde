@@ -1,11 +1,12 @@
-const { fetchDDE, setAdvise } = require('../fetchDDE')
+const { setAdvise } = require('../util/fetchDDE')
 const electEyeConfig = require('../config/ElectEyeConfig.json')
-const { speakTwice } = require('../speak')
+const { speakTwice } = require('../util/speak')
 
 class ElectEye {
-  constructor(serverName, itemName) {
+  constructor(serverName, itemName, maxTime) {
     this.serverName = serverName
     this.itemName = itemName
+    this.maxTime = maxTime
     this.isTrigger = false
   }
 
@@ -21,13 +22,13 @@ class ElectEye {
     })
   }
 
-  isStateNotChange(maxTime) {
+  isStateNotChange() {
     let notChangeTime = (Date.now() - this.lastSwitchTime) / 1000 
 
-    if(notChangeTime > maxTime && !this.isTrigger) {
+    if(notChangeTime > this.maxTime && !this.isTrigger) {
       this.isTrigger = true
       return true
-    } else if (notChangeTime <= maxTime && this.isTrigger) {
+    } else if (notChangeTime <= this.maxTime && this.isTrigger) {
       this.isTrigger = false
     }
 
@@ -44,7 +45,8 @@ class ElectEyeDetect {
       .reduce((col, electEyeName) => {
         col[electEyeName] = new ElectEye(
           this.serverName, 
-          electEyeConfig[this.location][electEyeName].itemName
+          electEyeConfig[this.location][electEyeName].itemName,
+          electEyeConfig[this.location][electEyeName].maxTime
         )
         
         return col
@@ -52,17 +54,11 @@ class ElectEyeDetect {
 
     this.isMon = false
     this.isInit = false
-    this.updateFreq = 1
+    this.updateFreq = 2
   }
 
   async init() {
     // init elect eye
-    
-    // Object.values(this.electEyeCol).forEach(electEye => {
-    //   await electEye.init()
-    // })
-    // console.log(Object.values(this.electEyeCol))
-
     await Promise.all(
       Object.values(this.electEyeCol).map(
         electEye => electEye.init()
