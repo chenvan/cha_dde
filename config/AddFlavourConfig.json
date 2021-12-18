@@ -9,7 +9,7 @@
       },
       "电子秤状态": {
         "itemName": {
-          "setting": "",
+          "setting": "Galaxy:ZY2_YPSpice_JK.Balance_YX227.FluxSP",
           "real": "Galaxy:ZY2_YPSpice_JK.Balance_YX227.Flux"
         },
         "valueType": "int",

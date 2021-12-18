@@ -52,16 +52,6 @@ class CabinetOutput {
     let traceDataConfig = cabinetConfig[location]["traceData"]
 
     this.traceDataCol = initTraceData(this.serverName, traceDataConfig)
-    // this.traceDataCol = Object.keys(traceDataConfig).reduce((col, key) => {
-      
-    //   col[key] = new TraceData(
-    //     this.serverName, 
-    //     traceDataConfig[key]['itemName'],
-    //     traceDataConfig[key]['valueType']
-    //   )
-
-    //   return col
-    // }, {})
   }
 
   // static isExistOutpurNr(location, outpurNr) {

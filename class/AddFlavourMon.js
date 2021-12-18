@@ -24,16 +24,6 @@ class AddFlavourMon {
 
     this.traceDataCol = initTraceData(this.serverName, traceDataConfig)
     
-    // this.traceDataCol = Object.keys(traceDataConfig).reduce((col, key) => {
-      
-    //   col[key] = new TraceData(
-    //     this.serverName, 
-    //     traceDataConfig[key]['itemName'],
-    //     traceDataConfig[key]['valueType']
-    //   )
-
-    //   return col
-    // }, {})
   }
 
   // 主程序间隔时间连续调用该程序
@@ -49,15 +39,6 @@ class AddFlavourMon {
         if(isChange) {
 
           console.log(`Trace ${key}, current value : ${this.traceDataCol[key].currentValue}.`)
-          
-          // 用静态方法检测出柜号是否存在 config 中
-          // if(key === '出柜号' && 
-          //     CabinetOutput.isExistOutpurNr(this.location, this.traceDataCol[key].currentValue)) {
-          //   // 出柜号变更
-          //   // 更新或创建新的 CabinetOutput 类, 并检查出柜频率
-          //   await this.cabinetOutput.init(this.traceDataCol[key].currentValue)
-
-          // } else 
 
           if(key === "批次" && this.traceDataCol[key].currentValue.slice(0, -3) !== "") {
             // 批次变更
@@ -71,22 +52,21 @@ class AddFlavourMon {
 
             // check parameter
           
-          } 
-          // else if(key === '筒生产状态') {
-          //   // 筒状态转为生产时 
-          //   // 1.触发语音
-          //   // 2.监控后舱低料位
+          } else if (key === "电子秤状态") {
+            // 筒状态转为生产时 
+            // 1.触发语音
+            // 2.监控后舱低料位
 
-          //   // 筒是生产状态的时候(或者秤有流量的时候), 电眼检查开启
-          //   // 当筒是其他状态(或者秤没有流量时), 电眼检查是否可以停掉
-          //   // 因为假设电眼检测到暂存仓提升带电眼因为有遮挡长时间亮, 而秤的流量已经掉到0关闭了检测, 那么可能会miss掉这次检测
-          //   // 或者我们都用 settimeout的方式, 延长10s设置 isMon
-
-          //   // 是否改用电子秤流量?
-          //   // this.electEyeDetect.isMon = true
-          //   console.log("%s.", this.traceDataCol[key].currentValue)
-
-          // }
+            // 筒是生产状态的时候(或者秤有流量的时候), 电眼检查开启
+            // 当筒是其他状态(或者秤没有流量时), 电眼检查是否可以停掉
+            // 因为假设电眼检测到暂存仓提升带电眼因为有遮挡长时间亮, 而秤的流量已经掉到0关闭了检测, 那么可能会miss掉这次检测
+            // 或者我们都用 settimeout的方式, 延长10s设置 isMon
+            if(this.traceDataCol[key].currentValue === 2) {
+              this.electEyeDetect.isMon = true
+            } else if(this.traceDataCol[key].currentValue === 0) {
+              this.electEyeDetect.isMon = false
+            }
+          }
         }
       } catch (err) {
         console.log(key)

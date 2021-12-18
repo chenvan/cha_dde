@@ -1,5 +1,6 @@
 const { fetchDDE, setAdvise } = require('../fetchDDE')
 const electEyeConfig = require('../config/ElectEyeConfig.json')
+const { speakTwice } = require('../speak')
 
 class ElectEye {
   constructor(serverName, itemName) {
@@ -13,15 +14,24 @@ class ElectEye {
     this.lastSwitchTime = Date.now()
 
     await setAdvise(this.serverName, this.itemName, eyeState => {
-      // eyeState 有没有空字符串的可能?  
+      // eyeState 有没有空字符串的可能
       this.lastSwitchTime = Date.now()
-      this.currentState = parseInt(eyeState, 10)
-      // 用 isTrigger 的方法应该不行
+      // console.log(`eye state: ${eyeState.item}: ${eyeState.data}`)
+      this.currentState = parseInt(eyeState.data, 12)
     })
   }
 
   isStateNotChange(maxTime) {
-      return (Date.now() - this.lastSwitchTime) / 1000 > maxTime
+    let notChangeTime = (Date.now() - this.lastSwitchTime) / 1000 
+
+    if(notChangeTime > maxTime && !this.isTrigger) {
+      this.isTrigger = true
+      return true
+    } else if (notChangeTime <= maxTime && this.isTrigger) {
+      this.isTrigger = false
+    }
+
+    return false
   }
 }
 
@@ -41,6 +51,7 @@ class ElectEyeDetect {
       }, {})
 
     this.isMon = false
+    this.isInit = false
     this.updateFreq = 1
   }
 
@@ -50,12 +61,15 @@ class ElectEyeDetect {
     // Object.values(this.electEyeCol).forEach(electEye => {
     //   await electEye.init()
     // })
+    // console.log(Object.values(this.electEyeCol))
 
     await Promise.all(
       Object.values(this.electEyeCol).map(
         electEye => electEye.init()
       )
     )
+
+    this.isInit = true
   }
 
   async update(updateCount) {
@@ -63,9 +77,14 @@ class ElectEyeDetect {
     
     if(!this.isMon) return
 
+    if(!this.isInit) await this.init()
+
     for (let [name, electEye] of Object.entries(this.electEyeCol)) {
+      console.log(`${name}: ${electEye.currentState} 持续时间：${(Date.now() - electEye.lastSwitchTime) / 1000}`)
+      
       if(electEye.isStateNotChange(10)) {
         console.log(`${this.location} ${name} 电眼状态长时间不变, 请注意`)
+        // speakTwice(`${this.location} ${name} 电眼状态长时间不变, 请注意`)
       }
     }
   }
