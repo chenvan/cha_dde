@@ -1,3 +1,0 @@
-function arrVoiceTips(location, brandName) {
-
-}

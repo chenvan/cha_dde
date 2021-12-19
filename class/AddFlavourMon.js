@@ -1,9 +1,13 @@
+"use strict"
+
 const { CabinetOutput } = require('./CabinetOutput')
 const { ElectEyeDetect } = require('./ElectEyeDetect')
 
-const AddFlavourConfig = require('../config/AddFlavourConfig.json')
 const { fetchDDE } = require('../util/fetchDDE')
 const { initTraceData } = require('../util/initTraceData')
+const { checkMoistureMeter } = require('../util/checkPara')
+
+const AddFlavourConfig = require('../config/AddFlavourConfig.json')
 
 class AddFlavourMon {
   constructor(location) {
@@ -52,7 +56,7 @@ class AddFlavourMon {
             this.cabinetOutput.isMon = true
 
             // 检查参数
-            this.checkPara()
+            this.checkPara(AddFlavourConfig[this.location]['para'])
 
           } else if (key === "电子秤状态") {
             // 筒状态转为生产时 
@@ -98,8 +102,17 @@ class AddFlavourMon {
     if (this.updateCount > 60) this.updateCount -= 60
   }
 
-  checkPara() {
+  async checkPara(paraConfig) {
+    
+    let resultList = await Promise.all([
+      checkMoistureMeter(this.location, this.serverName, paraConfig['MoistureMeter'])
+    ])
 
+    let finalResult = resultList.reduce((prev, curr) => prev && curr, true)
+    
+    if(finalResult) {
+      console.log(`${this.location} 参数检查完毕, 没有发现错误`)
+    }
   }
 }
 

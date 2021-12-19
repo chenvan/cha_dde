@@ -19,13 +19,13 @@
     },
     "para": {
       "MoistureMeter": {
-        "加料前水分仪": {
+        "入口水分仪": {
           "itemName": [
             "Galaxy:ZY2_YPSpice_JK.ProductUnit.MoistureMeter_JLQ.Read_Trim", 
             "Galaxy:ZY2_YPSpice_JK.ProductUnit.MoistureMeter_JLQ.Write_Trim"
           ]
         },
-        "加料后水分仪": {
+        "出口水分仪": {
           "itemName": [
             "Galaxy:ZY2_YPSpice_JK.ProductUnit.MoistureMeter_JLH.Read_Trim",
             "Galaxy:ZY2_YPSpice_JK.ProductUnit.MoistureMeter_JLH.Write_Trim"
