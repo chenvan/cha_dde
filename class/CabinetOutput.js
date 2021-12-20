@@ -54,10 +54,6 @@ class CabinetOutput {
     this.traceDataCol = initTraceData(this.serverName, traceDataConfig)
   }
 
-  // static isExistOutpurNr(location, outpurNr) {
-  //   return cabinetConfig[location].hasOwnProperty(outpurNr)
-  // }
-
   async updateTraceData() {
     
     for (let key in this.traceDataCol) {

@@ -1,16 +1,14 @@
 {
 	"六四加料": {
-		"换批": [
+		"批次": [
 			{
-				"offsetInterval" : 2,
-				"latestOffset": 5,
+				"offsetInterval" : 120,
 				"content" : "六四加料检查出口翻板门"
 			}
 		],
-		"开始后": [
+		"电子秤状态": [
 			{
-				"offsetInterval" : 3,
-				"latestOffset": 5,
+				"offsetInterval" : 180,
 				"content" : "六四加料开始喷料，使用二二五镜头查看加料出口"
 			}
 		]

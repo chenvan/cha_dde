@@ -6,6 +6,7 @@ const { ElectEyeDetect } = require('./ElectEyeDetect')
 const { fetchDDE } = require('../util/fetchDDE')
 const { initTraceData } = require('../util/initTraceData')
 const { checkMoistureMeter } = require('../util/checkPara')
+const { loadVoiceTips } = require('../util/loadVoiceTips')
 
 const AddFlavourConfig = require('../config/AddFlavourConfig.json')
 
@@ -26,6 +27,8 @@ class AddFlavourMon {
     let traceDataConfig = AddFlavourConfig[location]["traceData"]
 
     this.traceDataCol = initTraceData(this.serverName, traceDataConfig)
+
+    this.voiceTipsTimeId = []
     
   }
 
@@ -58,6 +61,8 @@ class AddFlavourMon {
             // 检查参数
             this.checkPara(AddFlavourConfig[this.location]['para'])
 
+            loadVoiceTips(this.location, key, this.currentBrandName)
+
           } else if (key === "电子秤状态") {
             // 筒状态转为生产时 
             // 1.触发语音
@@ -69,8 +74,14 @@ class AddFlavourMon {
             // 或者我们都用 settimeout的方式, 延长10s设置 isMon
             if(this.traceDataCol[key].currentValue === 2) {
               this.electEyeDetect.isMon = true
+              
+              this.voiceTipsTimeId = loadVoiceTips(this.location, key, this.currentBrandName)
+
             } else if(this.traceDataCol[key].currentValue === 0) {
+              
               this.electEyeDetect.isMon = false
+
+              this.voiceTipsTimeId.forEach(timeId => clearTimeout(timeId))
             }
           }
         }
