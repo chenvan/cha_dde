@@ -67,7 +67,7 @@ async function connectServer(serverName) {
         throw new Error(`server ${serverName} does not exist`)
     }
 
-    let tempClient = new NetDDEClient("view", {host: serverName})
+    let tempClient = new NetDDEClient("view", {host: serverName, timeout: 30000})
             
     tempClient.on("error", err => {
         //Error: read ECONNRESET

@@ -99,6 +99,9 @@ service init 出问题会让 init 不成功. 解决方法 service 使用 isInitS
 
 service update 出问题没有问题, 把变状态的语句放到 fetch 语句之后, 这样下一次 update 还能进行
 
+# 错误
+
+
 # 问题
 
 ### netdde 不支持中文
@@ -123,3 +126,12 @@ service update 出问题没有问题, 把变状态的语句放到 fetch 语句�
 第一次 request 的时候是能获得值的, 但是后面就不行了, 知道值变化后才能获取.
 
 怀疑布尔量都不能一直间歇获取(未证实), 使用 advice 倒是可以获取
+
+### 出现 Timeout waitting for answer of request ID 后, fetchDDE 中的 Advice 和 request 函数都无法获得数据, request 会出现 Not connected 的问题
+
+1. timeout 从默认的 10000 设置到 30000
+
+2. fetchDDE 函数捕捉到 connect error, 需要把 connectServers 中保存的 client 删除掉, 并继续抛出错误
+
+3. EyeDetect Service 需要重启
+

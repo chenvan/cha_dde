@@ -70,12 +70,14 @@ class ElectEyeDetect {
     this.isInit = true
   }
 
+  async reset() {
+    await this.init()
+  }
+
   async update(updateCount) {
     if(updateCount % this.updateFreq !== 0) return
     
     if(!this.isMon) return
-
-    if(!this.isInit) await this.init()
 
     for (let [name, electEye] of Object.entries(this.electEyeCol)) {
       // console.log(`${name}: ${electEye.currentState} 持续时间：${(Date.now() - electEye.lastSwitchTime) / 1000}`)

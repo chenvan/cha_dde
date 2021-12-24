@@ -61,7 +61,7 @@ class AddFlavourMon {
             // 检查参数
             this.checkPara(AddFlavourConfig[this.location]['para'])
 
-            loadVoiceTips(this.location, key, this.currentBrandName)
+            // loadVoiceTips(this.location, key, this.currentBrandName)
 
           } else if (key === "电子秤状态") {
             // 筒状态转为生产时 
@@ -73,21 +73,32 @@ class AddFlavourMon {
             // 因为假设电眼检测到暂存仓提升带电眼因为有遮挡长时间亮, 而秤的流量已经掉到0关闭了检测, 那么可能会miss掉这次检测
             // 或者我们都用 settimeout的方式, 延长10s设置 isMon
             if(this.traceDataCol[key].currentValue === 2) {
+              
+              if(!this.electEyeDetect.isInit) await this.electEyeDetect.init()
+
               this.electEyeDetect.isMon = true
               
-              this.voiceTipsTimeId = loadVoiceTips(this.location, key, this.currentBrandName)
+              // 每次重启都会执行语句加载, 这似乎不太对
+              // this.voiceTipsTimeId = loadVoiceTips(this.location, key, this.currentBrandName)
 
             } else if(this.traceDataCol[key].currentValue === 0) {
               
               this.electEyeDetect.isMon = false
 
-              this.voiceTipsTimeId.forEach(timeId => clearTimeout(timeId))
+              // this.voiceTipsTimeId.forEach(timeId => clearTimeout(timeId))
             }
           }
         }
       } catch (err) {
+        
         console.log(key)
         console.log(err)
+
+        if (err.message === "Not connected") {
+          await this.electEyeDetect.reset()
+
+          console.log('reset electEyeDetect')
+        }
       }
     }
   }
