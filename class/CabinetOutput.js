@@ -58,18 +58,23 @@ class CabinetOutput {
     
     for (let key in this.traceDataCol) {
 
-      let isChange = await this.traceDataCol[key].update()
+      try {
+        let isChange = await this.traceDataCol[key].update()
 
-      if(isChange) {
+        if(isChange) {
 
-        console.log(`Trace ${key}, current value : ${this.traceDataCol[key].currentValue}.`)
-        
-        if(key === '出柜号' && 
-            cabinetConfig[this.location].hasOwnProperty(this.traceDataCol[key].currentValue)) {
-          // 出柜号变更
-          await this.init(this.traceDataCol[key].currentValue)
-        } 
+          console.log(`Trace ${key}, current value : ${this.traceDataCol[key].currentValue}.`)
+          
+          if(key === '出柜号' && 
+              cabinetConfig[this.location].hasOwnProperty(this.traceDataCol[key].currentValue)) {
+            // 出柜号变更
+            await this.init(this.traceDataCol[key].currentValue)
+          } 
+        }
+      } catch(err) {
+        console.log(err)
       }
+      
     }
   }
   

@@ -7,6 +7,7 @@ const { fetchDDE } = require('../util/fetchDDE')
 const { initTraceData } = require('../util/initTraceData')
 const { checkMoistureMeter } = require('../util/checkPara')
 const { loadVoiceTips } = require('../util/loadVoiceTips')
+const { logger } = require('../util/loggerHelper')
 
 const AddFlavourConfig = require('../config/AddFlavourConfig.json')
 
@@ -91,13 +92,13 @@ class AddFlavourMon {
         }
       } catch (err) {
         
-        console.log(key)
-        console.log(err)
+        logger.info(key)
+        logger.error(err)
 
         if (err.message === "Not connected") {
           await this.electEyeDetect.reset()
 
-          console.log('reset electEyeDetect')
+          logger.info('reset electEyeDetect')
         }
       }
     }
@@ -106,9 +107,9 @@ class AddFlavourMon {
   async updateService() {
     for(let service of this.serviceList) {
       try {
-          await service.update(this.updateCount)    
+        await service.update(this.updateCount)    
       } catch(err) {
-        console.log(err)
+        logger.error(err)
       }
     }
   }
