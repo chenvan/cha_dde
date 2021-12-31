@@ -62,7 +62,10 @@ class AddFlavourMon {
             // 检查参数
             this.checkPara(AddFlavourConfig[this.location]['para'])
 
-            // loadVoiceTips(this.location, key, this.currentBrandName)
+            // 避免每次重启都会执行语音提示加载
+            if(this.traceDataCol[key].lastValue !== undefined) {
+              loadVoiceTips(this.location, key, this.currentBrandName)
+            }
 
           } else if (key === "电子秤状态") {
             // 筒状态转为生产时 
@@ -79,14 +82,19 @@ class AddFlavourMon {
 
               this.electEyeDetect.isMon = true
               
-              // 每次重启都会执行语句加载, 这似乎不太对
-              // this.voiceTipsTimeId = loadVoiceTips(this.location, key, this.currentBrandName)
+              // 避免每次重启都会执行语音提示加载
+              if(this.traceDataCol[key].lastValue !== undefined) {
+                this.voiceTipsTimeId = loadVoiceTips(this.location, key, this.currentBrandName)
+              }
 
             } else if(this.traceDataCol[key].currentValue === 0) {
               
               this.electEyeDetect.isMon = false
 
-              // this.voiceTipsTimeId.forEach(timeId => clearTimeout(timeId))
+              if(this.traceDataCol[key].lastValue !== undefined) {
+                this.voiceTipsTimeId.forEach(timeId => clearTimeout(timeId))
+              }
+
             }
           }
         }
@@ -134,7 +142,7 @@ class AddFlavourMon {
     let finalResult = resultList.reduce((prev, curr) => prev && curr, true)
     
     if(finalResult) {
-      console.log(`${this.location} 参数检查完毕, 没有发现错误`)
+      logger.info(`${this.location} 参数检查完毕, 没有发现错误`)
     }
   }
 }
