@@ -1,0 +1,36 @@
+{
+  "六四回潮": {
+    "serverName": "VMGZZSHMI3",
+    "traceData": {
+      "回潮筒批次": {
+        "itemName": "Galaxy:ZY2_YPSpice_JK.ProductUnit.Batch_Now",
+        "valueType": "string",
+        "classType": "switch"
+      },
+      "除杂批次": {
+        "itemName": "Galaxy:ZY2_YPSpice_JK.ProductUnit.Batch_Now",
+        "valueType": "string",
+        "classType": "switch"
+      },
+      "电子秤状态": {
+        "itemName": {
+          "setting": "Galaxy:ZY2_YPSpice_JK.Balance_YX227.FluxSP",
+          "real": "Galaxy:ZY2_YPSpice_JK.Balance_YX227.Flux"
+        },
+        "valueType": "int",
+        "precis": 1,
+        "classType": "setting"
+      }
+    },
+    "para": {
+      "MoistureMeter": {
+        "出口水分仪": {
+          "itemName": [
+            "Galaxy:ZY2_YPSpice_JK.ProductUnit.MoistureMeter_JLH.Read_Trim",
+            "Galaxy:ZY2_YPSpice_JK.ProductUnit.MoistureMeter_JLH.Write_Trim"
+          ]
+        }
+      }
+    }
+  }
+}

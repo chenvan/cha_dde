@@ -8,5 +8,15 @@
       "itemName": "Galaxy:ZY2_YPOutSilo_JK.Feed_YX225.Switch.Full",
       "maxTime": 40
     }
+  },
+  "六四回潮": {
+    "切片前": {
+      "itemName": "Galaxy:ZY2_YPOutSilo_JK.Feed_YX225.Switch.Bottom",
+      "maxTime": 20
+    },
+    "切片后": {
+      "itemName": "Galaxy:ZY2_YPOutSilo_JK.Feed_YX225.Switch.Full",
+      "maxTime": 40
+    }
   }
 }
