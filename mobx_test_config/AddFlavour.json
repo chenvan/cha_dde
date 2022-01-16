@@ -1,0 +1,37 @@
+{
+  "六四加料": {
+    "serverName": "VMGZZSHMI3",
+    "advise": {
+      "加料批号": {
+        "itemName": "Galaxy:ZY2_YPSpice_JK.ProductUnit.Batch_Now",
+        "type": "id"
+      },
+      "提升带电眼": {
+        "itemName": "Galaxy:ZY2_YPOutSilo_JK.Feed_YX225.Switch.Bottom",
+        "type": "device",
+        "maxTime": 20
+      },
+      "暂存柜进柜电眼": {
+        "itemName": "Galaxy:ZY2_YPOutSilo_JK.Feed_YX225.Switch.Full",
+        "type": "device",
+        "maxTime": 40
+      }
+    },
+    "fetch": {
+      "mainWeightBell": {
+        "setting": {
+          "itemName": "Galaxy:ZY2_YPSpice_JK.Balance_YX227.FluxSP",
+          "valueType": "int"
+        },
+        "accu": {
+          "itemName": "",
+          "valueType": "int"
+        },
+        "real": {
+          "itemName": "Galaxy:ZY2_YPSpice_JK.Balance_YX227.Flux",
+          "valueType": "int"
+        }
+      }
+    }
+  }
+}

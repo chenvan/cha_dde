@@ -11,6 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "iconv-lite": "^0.6.3",
+    "mobx": "^6.3.12",
     "netdde": "^1.0.2",
     "winax": "^3.3.2",
     "winston": "^3.3.3"

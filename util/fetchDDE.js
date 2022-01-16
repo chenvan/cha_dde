@@ -48,10 +48,10 @@ async function setAdvise(serverName, itemName, callback){
         await connectServer(serverName)
     }
 
-    await connectingServers[serverName].advise('tagname', itemName, Constants.dataType.CF_TEXT)
-
     // 程序本来只使用 "advise" 这个事件名去触发数据, 我们需要改成用 itemName 作为事件名去触发数据  
     connectingServers[serverName].on(itemName, d => callback(d))
+
+    await connectingServers[serverName].advise('tagname', itemName, Constants.dataType.CF_TEXT)
 }
 
 async function cancelAdvise(serverName, itemName) {

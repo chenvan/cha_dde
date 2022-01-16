@@ -155,3 +155,36 @@ service update 出问题没有问题, 把变状态的语句放到 fetch 语句�
 
 3. EyeDetect Service 需要重启
 
+### advice 的初次数据获取不到
+
+修改 src\client\client.js 中 advise 函数, 把 reqVal 属性改为 true
+
+# 新思路
+使用mobx改造程序
+
+mobx管理class
+
+问题是我暂时不用react和view, 我如何完成 action -> observable state -> derived value -> reaction 这个链条
+
+action
+
+定期获取数据(setInterval), listener(所谓advice)的callback
+
+observable state
+
+监控的数据
+
+derived value
+
+由监控数据派生的数据
+
+reaction
+
+暂时不需要? 警告虽然可以放到这里, 但也能放在前面两个地方
+
+官方文档建议:
+
+```
+  如果一个副作用会为了响应很小的一组 events 或 actions 而执行，那么直接从那些特定的 action 中触发这个副作用通常会更容易理解
+```
+
