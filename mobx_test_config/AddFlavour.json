@@ -31,6 +31,120 @@
           "itemName": "Galaxy:ZY2_YPSpice_JK.Balance_YX227.Flux",
           "valueType": "int"
         }
+      },
+      "cabinet": {
+        "outputNr": {
+          "itemName": "Galaxy:ZY2_YPSpice_JK.ProductUnit.SLOut1_Now",
+          "valueType": "int"
+        },
+        "2101": {
+          "halfEye":{
+            "itemName": "Galaxy:ZY2_YPCylinder_JK.CabinetIn_2101.CabInSwitch.Middle_1",
+            "valueType": "int"
+          },
+          "total": {
+            "itemName": "Galaxy:ZY2_YPOutSilo_JK.CabinetOut_2101.CabInfo.InWeight",
+            "valueType": "int"
+          },
+          "inMode": {
+            "itemName": "Galaxy:ZY2_YPOutSilo_JK.CabinetOut_2101.CabInfo.InMode",
+            "valueType": "int"
+          },
+          "highFreqSetting": {
+            "itemName": "Galaxy:ZY2_YPOutSilo_JK.CabinetOut_2101.CabOut.Bottom.HighFreq",
+            "valueType": "int"
+          },
+          "lowFreqSetting": {
+            "itemName": "Galaxy:ZY2_YPOutSilo_JK.CabinetOut_2101.CabOut.Bottom.LowFreq",
+            "valueType": "int"
+          },
+          "reference": {
+            "diff": 450,
+            "lowFreq": 21,
+            "total": 6800
+          }
+        },
+        "2102": {
+          "halfEye":{
+            "itemName": "Galaxy:ZY2_YPCylinder_JK.CabinetIn_2101.CabInSwitch.Middle_2",
+            "valueType": "int"
+          },
+          "total": {
+            "itemName": "Galaxy:ZY2_YPOutSilo_JK.CabinetOut_2102.CabInfo.InWeight",
+            "valueType": "int"
+          },
+          "inMode": {
+            "itemName": "Galaxy:ZY2_YPOutSilo_JK.CabinetOut_2102.CabInfo.InMode",
+            "valueType": "int"
+          },
+          "highFreqSetting": {
+            "itemName": "Galaxy:ZY2_YPOutSilo_JK.CabinetOut_2102.CabOut.Bottom.HighFreq",
+            "valueType": "int"
+          },
+          "lowFreqSetting": {
+            "itemName": "Galaxy:ZY2_YPOutSilo_JK.CabinetOut_2102.CabOut.Bottom.LowFreq",
+            "valueType": "int"
+          },
+          "reference": {
+            "diff": 450,
+            "lowFreq": 21,
+            "total": 6800
+          }
+        },
+        "2103": {
+          "halfEye":{
+            "itemName": "Galaxy:ZY2_YPCylinder_JK.CabinetIn_2103.CabInSwitch.Middle_1",
+            "valueType": "int"
+          },
+          "total": {
+            "itemName": "Galaxy:ZY2_YPOutSilo_JK.CabinetOut_2103.CabInfo.InWeight",
+            "valueType": "int"
+          },
+          "inMode": {
+            "itemName": "Galaxy:ZY2_YPOutSilo_JK.CabinetOut_2103.CabInfo.InMode",
+            "valueType": "int"
+          },
+          "highFreqSetting": {
+            "itemName": "Galaxy:ZY2_YPOutSilo_JK.CabinetOut_2103.CabOut.Bottom.HighFreq",
+            "valueType": "int"
+          },
+          "lowFreqSetting": {
+            "itemName": "Galaxy:ZY2_YPOutSilo_JK.CabinetOut_2103.CabOut.Bottom.LowFreq",
+            "valueType": "int"
+          },
+          "reference": {
+            "diff": 450,
+            "lowFreq": 21,
+            "total": 6800
+          }
+        },
+        "2104": {
+          "halfEye":{
+            "itemName": "Galaxy:ZY2_YPCylinder_JK.CabinetIn_2103.CabInSwitch.Middle_2",
+            "valueType": "int"
+          },
+          "total": {
+            "itemName": "Galaxy:ZY2_YPOutSilo_JK.CabinetOut_2104.CabInfo.InWeight",
+            "valueType": "int"
+          },
+          "inMode": {
+            "itemName": "Galaxy:ZY2_YPOutSilo_JK.CabinetOut_2104.CabInfo.InMode",
+            "valueType": "int"
+          },
+          "highFreqSetting": {
+            "itemName": "Galaxy:ZY2_YPOutSilo_JK.CabinetOut_2104.CabOut.Bottom.HighFreq",
+            "valueType": "int"
+          },
+          "lowFreqSetting": {
+            "itemName": "Galaxy:ZY2_YPOutSilo_JK.CabinetOut_2104.CabOut.Bottom.LowFreq",
+            "valueType": "int"
+          },
+          "reference": {
+            "diff": 450,
+            "lowFreq": 21,
+            "total": 6800
+          }
+        }
       }
     }
   }

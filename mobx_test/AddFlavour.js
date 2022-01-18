@@ -46,9 +46,10 @@
   store 需要一直往下传递, 然后在接受 store 的 class 调用自己需要的方法
 */
 const config = require("../mobx_test_config/AddFlavour.json")
-const { makeAutoObservable, action, reaction } = require("mobx")
+const { makeAutoObservable, action, reaction, override } = require("mobx")
 const { setAdvise, fetchDDE } = require("../util/fetchDDE")
 const { logger } = require("../util/loggerHelper")
+const { speakTwice } = require("../util/speak")
 
 
 class AddFlavour {
@@ -56,33 +57,39 @@ class AddFlavour {
   line
   serverName
   state
+  updateCount
   idMap = {}
-  deviceMap = {}
+  deviceMap = []
   mainWeighBell = {}
+  cabinetInfo = {}
 
 
   constructor(line) {
     makeAutoObservable(this, {
       line: false,
-      serverName: false
+      serverName: false,
+      updateCount: false
     })
   
     this.line = line
     this.serverName = config[line]["serverName"]
+    this.updateCount = 0
     
     this.state = "停止"
 
     // reaction
     reaction(
       () => this.idMap["出柜批号"],
-      () => {
-        // 出柜
+      id => {
+        if(id) {
+          this.fetchCabinetInfo(config[this.line]["fetch"]["cabinet"])
+        }
       }
     )
 
     reaction(
       () => this.idMap["加料批号"],
-      (id) => {
+      id => {
         if(this.state === "停止" && id) {
           this.state = "准备"
           this.fetchSetting()
@@ -142,44 +149,126 @@ class AddFlavour {
     // 检查 device 状态持续时间
   }
 
-  *fetchWeightBellRealVolume () {
+  *fetchWeightBellRealVolume (mainWeighBellConfig) {
     this.mainWeighBell["real"] = yield fetchDDE(
       this.serverName, 
-      config[this.line]["fetch"]["mainWeightBell"]["real"]["itemName"], 
-      config[this.line]["fetch"]["mainWeightBell"]["real"]["valueType"]
+      mainWeighBellConfig["real"]["itemName"], 
+      mainWeighBellConfig["real"]["valueType"]
     )
   }
 
-  *fetchWeightBellAccuVolume () {
+  *fetchWeightBellAccuVolume (mainWeighBellConfig) {
     this.mainWeighBell["accu"] = yield fetchDDE(
       this.serverName, 
-      config[this.line]["fetch"]["mainWeightBell"]["accu"]["itemName"], 
-      config[this.line]["fetch"]["mainWeightBell"]["accu"]["valueType"]
+      mainWeighBellConfig["accu"]["itemName"], 
+      mainWeighBellConfig["accu"]["valueType"]
     )
   }
 
-  *fetchSetting () {
+  *fetchSetting (mainWeighBellConfig) {
     // 获取设定参数
     this.mainWeighBell["setting"] = yield fetchDDE(
       this.serverName, 
-      config[this.line]["fetch"]["mainWeightBell"]["setting"]["itemName"],
-      config[this.line]["fetch"]["mainWeightBell"]["setting"]["valueType"]
+      mainWeighBellConfig["setting"]["itemName"],
+      mainWeighBellConfig["setting"]["valueType"]
     )
   }
 
-  *fetchCabinetInfo () {
+  *fetchCabinetInfo (cabinetConig) {
+    // 获得出柜号
+    this.cabinetInfo["outputNr"] = yield fetchDDE(this.serverName, cabinetConig["outputNr"]["itemName"],  cabinetConig["outputNr"]["valueType"])
     
+    // 获得出柜信息
+    if (cabinetConig.hasOwnProperty(this.cabinetInfo["outputNr"])) {
+      for(const [key, value] of Object.entries(cabinetConig[this.cabinetInfo["outputNr"]])) {
+        this.cabinetInfo[key] = yield fetchDDE(this.serverName, value.itemName, value.valueType)
+      }
+    }
+
+    // 检查出柜频率是否合适
+  }
+
+  *checkDeviceState() {
+
+  }
+
+  refreshUpdateCount() {
+    this.updateCount += 1
+    if(this.updateCount > 60) this.updateCount = 1
   }
 }
 
+class Device {
+  deviceName
+  maxDuration
+  deviceState
+  lastUpdateMoment
+  isTrigger
 
+  constructor(deviceName, maxDuration) {
+    makeAutoObservable(this, {
+      deviceName: false,
+      maxDuration: false,
+      isTrigger: false
+    })
+
+    this.deviceName = deviceName
+    this.maxDuration = maxDuration
+    this.isTrigger = false
+  }
+
+  *init(serverName, itemName) {
+    logger.info(`${this.deviceName}初始化`)
+    yield setAdvise(serverName, itemName, action(state => {
+      logger.info(`${this.deviceName} state change to ${state.data}.`)
+      this.deviceState = state.data
+      this.lastUpdateMoment = Date.now()
+    }))
+  }
+
+  *reConnect(serverName, itemName) {
+    logger.info(`${this.deviceName}重启`)
+    yield this.init(serverName, itemName)
+  }
+
+  checkState(now) {
+    let duration = (now - this.lastUpdateMoment) / 1000
+    if(duration > this.maxDuration && !this.isTrigger) {
+      logger.info(`${this.deviceName}. 状态${this.state}. 持续时间${duration}. 大于设定最大时间 ${this.maxDuration}.`)
+      this.isTrigger = true
+    } else if(duration <= this.maxDuration) {
+      this.isTrigger = false
+    }
+  }
+}
+
+class DeviceWithSpecifyState extends Device {
+  specifyState
+
+  constructor(deviceName, maxDuration, specifyState) {
+    super(deviceName, maxDuration)
+    
+    makeObservable(this, {
+      specifyState: false,
+      checkState: override
+    })
+
+    this.specifyState = specifyState
+  }
+
+  checkState(now) {
+    if(this.specifyState === this.deviceState) {
+      super.checkState(now)
+    }
+  }
+}
 
 function *test() {
   let addFlavourMon = new AddFlavour("六四加料")
 
   yield addFlavourMon.init()
 
-  setInterval(addFlavourMon.update, 1000 * 20)
+  setInterval(addFlavourMon.update, 1000 * 10)
 }
 
 test()
