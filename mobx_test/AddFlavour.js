@@ -1,67 +1,24 @@
 'use strict'
-/*
-使用mobx进行state管理
-之后做界面时可以比较方便?
-*/
 
-/*
-加料需要管理的数据有:
-
-出柜号
-出柜信息(进柜方式, 进柜量, 出柜高低频率, 半柜电眼)
-进暂存柜控制电眼
-提升带控制电眼
-电子秤流量
-电子秤流量设定
-批号
-*/
-
-/*
-  observable data
-    advise data 
-      出柜批次
-      加料批次
-      暂存柜进柜电眼
-      提升带电眼
-
-    fetch once data
-      牌号
-      出柜号
-      出柜信息
-      入口水分仪
-      出口水分仪
-
-    fetch interval data
-      秤累计量
-      秤实际流量
-
-    other data
-      生产状态
-      serverName
-*/
-
-/*
-  store 需要有自身的方法? 更新store里的数据?
-
-  store 需要一直往下传递, 然后在接受 store 的 class 调用自己需要的方法
-*/
 const config = require("../mobx_test_config/AddFlavour.json")
-const { makeAutoObservable, action, reaction, override } = require("mobx")
+const { makeAutoObservable, action, reaction, override, autorun } = require("mobx")
 const { setAdvise, fetchDDE } = require("../util/fetchDDE")
 const { logger } = require("../util/loggerHelper")
 const { speakTwice } = require("../util/speak")
 
-
+/*
+state: 
+*/
 class AddFlavour {
   
   line
   serverName
   state
   updateCount
-  idMap = {}
-  deviceMap = []
-  mainWeighBell = {}
-  cabinetInfo = {}
+  id
+  deviceList = []
+  mainWeighBell
+  cabinet
 
 
   constructor(line) {
@@ -76,120 +33,93 @@ class AddFlavour {
     this.updateCount = 0
     
     this.state = "停止"
+    this.mainWeighBell = new WeightBell(this.line, config[line]["mainWeightBell"])
+    this.cabinet = new Cabinet(this.line, config[line]["cabinet"])
 
-    // reaction
-    reaction(
-      () => this.idMap["出柜批号"],
-      id => {
-        if(id) {
-          this.fetchCabinetInfo(config[this.line]["fetch"]["cabinet"])
-        }
-      }
-    )
+    // reaction(
+    //   () => this.id,
+    //   id => {
+    //     if(this.state === "停止" && id) {
+    //       this.state = "准备"
+    //       this.mainWeighBell.fetchSetting(this.serverName, config[this.line]["mainWeightBell"]["setting"])
+    //     } else if (this.state === "生产" && !id) {
+    //       this.state = "停止"
+    //     }
+    //   }
+    // )
 
-    reaction(
-      () => this.idMap["加料批号"],
-      id => {
-        if(this.state === "停止" && id) {
-          this.state = "准备"
-          this.fetchSetting()
-        } else if (this.state === "生产" && !id) {
-          this.state = "停止"
-        }
-      }
-    )
-
-    reaction(
-      () => this.isMainWightBellRunning,
-      () => {
-        if(this.state ==="准备" && this.isMainWightBellRunning) {
-          this.state = "生产"
-          
-        }
-      }
-    )
-  }
-
-  get isMainWightBellRunning() {
-    return !this.mainWeighBell["setting"] && 
-              Math.abs(this.mainWeighBell["setting"] - this.mainWeighBell["real"]) < 100
+    // reaction(
+    //   () => this.mainWeighBell.state,
+    //   mainWeightBellState => {
+    //     if(this.state ==="准备" && mainWeightBellState ==="运行") {
+    //       this.state = "生产"
+    //     }
+    //   }
+    // )
   }
 
   *init() {
     // init advise
-    yield initAdviseData(config[this.line])
+    yield initAdviseData(config[this.line]["advise"])
+    yield this.mainWeighBell.init(this.serverName)
+    yield this.cabinet.init(this.serverName)
+  }
+
+  *reConnect() {
+
   }
 
   *initAdviseData(adviseConfigMap) {
     for(const[key, value] of Object.entries(adviseConfigMap)) {
       logger.info(`init advise -> ${key}: ${value}`)
-
+      
       if(value.type === "device" ) {
+        let device
+
         if(value.hasOwnProperty("detectState")) {
-          
+          device = new DeviceWithSpecifyState(this.line, key, value.maxTime, value.itemName, value.detectState)
         } else {
-         
+          device = new Device(this.line, key, value.maxTime, value.itemName)
         }
+
+        yield device.init(this.serverName)
+
+        deviceList.push(device)
+
       } else if(value.type === "id") {
         yield setAdvise(this.serverName, value.itemName, action(state => {
           logger.info(`${key} value change to ${state.data}.`)
-          this.idMap[key] = state.data.slice(0, -3)
+          this.id = state.data.slice(0, -3)
         }))
       }
     }
   }
 
+  *reConnectAdviseData() {
+
+  }
+
   *update() {
-    // trigger action
 
-    // 获得电子秤流量
+    this.refreshUpdateCount()
 
-    // 获得电子秤累积量
 
     // 检查 device 状态持续时间
-  }
+    this.checkDeviceState()
 
-  *fetchWeightBellRealVolume (mainWeighBellConfig) {
-    this.mainWeighBell["real"] = yield fetchDDE(
-      this.serverName, 
-      mainWeighBellConfig["real"]["itemName"], 
-      mainWeighBellConfig["real"]["valueType"]
-    )
-  }
-
-  *fetchWeightBellAccuVolume (mainWeighBellConfig) {
-    this.mainWeighBell["accu"] = yield fetchDDE(
-      this.serverName, 
-      mainWeighBellConfig["accu"]["itemName"], 
-      mainWeighBellConfig["accu"]["valueType"]
-    )
-  }
-
-  *fetchSetting (mainWeighBellConfig) {
-    // 获取设定参数
-    this.mainWeighBell["setting"] = yield fetchDDE(
-      this.serverName, 
-      mainWeighBellConfig["setting"]["itemName"],
-      mainWeighBellConfig["setting"]["valueType"]
-    )
-  }
-
-  *fetchCabinetInfo (cabinetConig) {
-    // 获得出柜号
-    this.cabinetInfo["outputNr"] = yield fetchDDE(this.serverName, cabinetConig["outputNr"]["itemName"],  cabinetConig["outputNr"]["valueType"])
     
-    // 获得出柜信息
-    if (cabinetConig.hasOwnProperty(this.cabinetInfo["outputNr"])) {
-      for(const [key, value] of Object.entries(cabinetConig[this.cabinetInfo["outputNr"]])) {
-        this.cabinetInfo[key] = yield fetchDDE(this.serverName, value.itemName, value.valueType)
-      }
-    }
+    
 
-    // 检查出柜频率是否合适
+    // 更新电子秤
+    yield this.mainWeighBell.update(this.serverName)
+
+    // 更新出柜 
+    yield this.cabinet.update(this.serverName, this.mainWeighBell.accu)
   }
 
-  *checkDeviceState() {
-
+  checkDeviceState() {
+    // 检查 device state 是否维持长时间不变
+    this.deviceList.forEach(device => device.checkState(Date.now()))
   }
 
   refreshUpdateCount() {
@@ -199,42 +129,48 @@ class AddFlavour {
 }
 
 class Device {
+  line
   deviceName
   maxDuration
+  itemName
   deviceState
   lastUpdateMoment
   isTrigger
 
-  constructor(deviceName, maxDuration) {
+  constructor(line, deviceName, maxDuration, itemName) {
     makeAutoObservable(this, {
       deviceName: false,
       maxDuration: false,
-      isTrigger: false
+      itemName: false,
+      isTrigger: false,
+      line: false
     })
 
+    this.line = line
     this.deviceName = deviceName
     this.maxDuration = maxDuration
+    this.itemName = itemName
     this.isTrigger = false
   }
 
-  *init(serverName, itemName) {
+  *init(serverName) {
     logger.info(`${this.deviceName}初始化`)
-    yield setAdvise(serverName, itemName, action(state => {
+    yield setAdvise(serverName, this.itemName, action(state => {
       logger.info(`${this.deviceName} state change to ${state.data}.`)
       this.deviceState = state.data
       this.lastUpdateMoment = Date.now()
     }))
   }
 
-  *reConnect(serverName, itemName) {
+  *reConnect(serverName) {
     logger.info(`${this.deviceName}重启`)
-    yield this.init(serverName, itemName)
+    yield this.init(serverName)
   }
 
   checkState(now) {
     let duration = (now - this.lastUpdateMoment) / 1000
     if(duration > this.maxDuration && !this.isTrigger) {
-      logger.info(`${this.deviceName}. 状态${this.state}. 持续时间${duration}. 大于设定最大时间 ${this.maxDuration}.`)
+      logger.info(`${this.line} ${this.deviceName}. 状态${this.state}. 持续时间${duration}. 大于设定最大时间 ${this.maxDuration}.`)
       this.isTrigger = true
     } else if(duration <= this.maxDuration) {
       this.isTrigger = false
@@ -245,8 +181,8 @@ class Device {
 class DeviceWithSpecifyState extends Device {
   specifyState
 
-  constructor(deviceName, maxDuration, specifyState) {
-    super(deviceName, maxDuration)
+  constructor(line, deviceName, maxDuration, itemName, specifyState) {
+    super(line, deviceName, maxDuration, itemName)
     
     makeObservable(this, {
       specifyState: false,
@@ -260,6 +196,169 @@ class DeviceWithSpecifyState extends Device {
     if(this.specifyState === this.deviceState) {
       super.checkState(now)
     }
+  }
+}
+
+class WeightBell {
+  line
+  electEye
+  setting = 0
+  accu
+  real
+
+  constructor(line, weightBellConfig) {
+    makeAutoObservable(this, {
+      weightBellConfig: false,
+      line: false
+    })
+
+    this.line = line
+    this.weightBellConfig = weightBellConfig
+  }
+
+  *init(serverName) {
+    if(this.weightBellConfig.hasOwnProperty("electEye")) {
+      this.electEye = new Device(
+        this.line,
+        this.weightBellConfig.electEye.name, 
+        this.weightBellConfig.electEye.maxTime, 
+        this.weightBellConfig.electEye.itemName
+      )
+      yield this.electEye.init(serverName)
+    }
+  }
+
+  *reConnect(serverName) {
+    yield this.electEye.reConnect(serverName)
+  }
+
+  *fetchSetting(serverName) {
+    this.setting = yield fetchDDE(
+      serverName, 
+      this.weightBellConfig.setting.itemName, 
+      this.weightBellConfig.setting.valueType
+    )
+  }
+
+  *fetchAccu(serverName) {
+    this.accu = yield fetchDDE(
+      serverName, 
+      this.weightBellConfig.accu.itemName, 
+      this.weightBellConfig.accu.valueType
+    )
+  }
+
+  *fetchReal(serverName) {
+    this.real = yield fetchDDE(
+      serverName, 
+      this.weightBellConfig.real.itemName, 
+      this.weightBellConfig.real.valueType
+    )
+  }
+
+  get state() {
+    if(this.setting === 0) {
+      return "不运行"
+    } else {
+      if(this.real < 10  ) {
+        return "停止"
+      } else if (Math.abs(this.setting - this.real) < 100) {
+        return "运行"
+      }
+    }
+  }
+
+  *update(serverName) {
+    yield this.fetchReal(serverName)
+    yield this.fetchAccu(serverName)
+
+    if (this.state === "运行") {
+      this.electEye.checkState(Date.now())
+    } 
+  }
+}
+/*
+Cabinet 监控柜的半柜电眼是否正常
+state: 初始化 -> 监控 -> 完成
+*/
+class Cabinet {
+  line
+  outputNr
+  state
+  total
+
+  constructor(line, cabinetConfig) {
+    makeAutoObservable(this, {
+      cabinetConfig: false,
+      line: false
+    })
+
+    this.cabinetConfig = cabinetConfig
+    this.line = line
+
+    reaction(
+      () => this.outputNr,
+      () => {
+        if(this.cabinetConig.hasOwnProperty(this.outputNr)) {
+          if (this.state === "监控") {
+            logger.info(`出柜号出现异常`)
+          }
+
+          this.state = "初始化"
+        }
+      }
+    )
+  }
+
+  *init(serverName) {
+    yield setAdvise(serverName, this.cabinetConig["outputNr"].itemName, state => {
+      logger.info(`cabinet output Nr change to ${state.data}.`)
+      this.outputNr = state.data
+    })
+  }
+
+  *reConnect(serverName) {
+    yield this.init(serverName)
+  }
+
+  *update(serverName, weightBellAccu) {
+    //使用state来描述cabinet进行到哪一步, 下一步的动作是什么
+    if (this.state === "初始化") {
+      this.total = yield fetchDDE(
+        serverName,
+        this.config[this.outputNr]["total"].itemName,
+        this.config[this.outputNr]["total"].valueType
+      )
+      
+      this.state = "监控"
+
+      // 检查出柜频率
+      yield this.checkOutputFreqSetting()
+      
+      
+    } else if (this.state === "监控") {
+      if(this.total - weightBellAccu < this.cabinetConig[this.outputNr].reference.diff) {
+        let halfEyeState = yield this.getHalfEyeState(this.serverName)
+        
+        if(halfEyeState === 1) {
+          logger.info(`${this.line} 加料出柜未转高速`)
+        }
+
+        this.state = "完成"
+      }
+    }
+  }
+
+  *checkOutputFreqSetting() {
+    // 
+  }
+
+  *getHalfEyeState(serverName) {
+    return yield fetchDDE(
+      serverName, 
+      this.config[this.outputNr]["halfEye"].itemName,
+      this.config[this.outputNr]["halfEye"].valueType,
+    )
   }
 }
 
