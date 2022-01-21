@@ -7,7 +7,13 @@ const { logger } = require("../util/loggerHelper")
 const { speakTwice } = require("../util/speak")
 
 /*
-state: 
+加料监控状态
+
+准备: 加料批次发生转换
+参数检查完成: 
+监控 :电子秤进入运行状态
+停止: 秤状态为停止是
+
 */
 class AddFlavour {
   
@@ -36,26 +42,14 @@ class AddFlavour {
     this.mainWeighBell = new WeightBell(this.line, config[line]["mainWeightBell"])
     this.cabinet = new Cabinet(this.line, config[line]["cabinet"])
 
-    // reaction(
-    //   () => this.id,
-    //   id => {
-    //     if(this.state === "停止" && id) {
-    //       this.state = "准备"
-    //       this.mainWeighBell.fetchSetting(this.serverName, config[this.line]["mainWeightBell"]["setting"])
-    //     } else if (this.state === "生产" && !id) {
-    //       this.state = "停止"
-    //     }
-    //   }
-    // )
-
-    // reaction(
-    //   () => this.mainWeighBell.state,
-    //   mainWeightBellState => {
-    //     if(this.state ==="准备" && mainWeightBellState ==="运行") {
-    //       this.state = "生产"
-    //     }
-    //   }
-    // )
+    reaction(
+      () => this.id,
+      id => {
+        if(this.state === "停止" && id) {
+          this.state = "准备"
+        }
+      }
+    )
   }
 
   *init() {
@@ -103,18 +97,33 @@ class AddFlavour {
 
     this.refreshUpdateCount()
 
+    if(this.state === "准备") {
+      yield this.cabinet.updateCabinetInfo(this.serverName)
+      yield this.mainWeighBell.fetchSetting(this.serverName)
 
-    // 检查 device 状态持续时间
-    this.checkDeviceState()
+      if (this.cabinet.state === "监控") {
+        this.state = "准备完成"
+      }
+      // 检查参数
+      //
 
-    
-    
+    }else if(this.state === "准备完成" || this.state === "停止") {
+      if(this.mainWeighBell.state === "运行正常") {
+        this.state = "监控"
+      }
+    }else if(this.state === "监控") {
+      // 检查 device 状态持续时间是否符合要求
+      this.checkDeviceState()
 
-    // 更新电子秤
-    yield this.mainWeighBell.update(this.serverName)
+      // 先更新电子秤, 再检查半柜状态
+      yield this.mainWeighBell.update(this.serverName)
 
-    // 更新出柜 
-    yield this.cabinet.update(this.serverName, this.mainWeighBell.accu)
+      yield this.cabinet.checkHalfEyeState(this.serverName, this.mainWeighBell.accu)
+
+      if(this.mainWeighBell.state === "运行停止") {
+        this.state = "停止"
+      }
+    } 
   }
 
   checkDeviceState() {
@@ -199,6 +208,13 @@ class DeviceWithSpecifyState extends Device {
   }
 }
 
+/*
+电子秤的状态: 
+不运行: 设定流量为0
+运行正常: 设定流量不为0, 实际流量与设定流量接近
+运行波动: 设定流量不为0, 实际流量与设定流量不接近
+运行停止: 设定流量不为0, 实际流量接近0
+*/
 class WeightBell {
   line
   electEye
@@ -261,9 +277,9 @@ class WeightBell {
       return "不运行"
     } else {
       if(this.real < 10  ) {
-        return "停止"
-      } else if (Math.abs(this.setting - this.real) < 100) {
-        return "运行"
+        return "运行停止"
+      } else {
+        return Math.abs(this.setting - this.real) < 100 ? "运行正常" : "运行波动"
       }
     }
   }
@@ -272,14 +288,14 @@ class WeightBell {
     yield this.fetchReal(serverName)
     yield this.fetchAccu(serverName)
 
-    if (this.state === "运行") {
+    if (this.state === "运行正常" || this.state === "运行波动") {
       this.electEye.checkState(Date.now())
     } 
   }
 }
 /*
 Cabinet 监控柜的半柜电眼是否正常
-state: 初始化 -> 监控 -> 完成
+state: 获取信息 -> 监控 -> 完成
 */
 class Cabinet {
   line
@@ -301,10 +317,10 @@ class Cabinet {
       () => {
         if(this.cabinetConig.hasOwnProperty(this.outputNr)) {
           if (this.state === "监控") {
-            logger.info(`出柜号出现异常`)
+            logger.info(`监控状态下, 出柜号发生更换`)
           }
 
-          this.state = "初始化"
+          this.state = "获取信息"
         }
       }
     )
@@ -321,9 +337,8 @@ class Cabinet {
     yield this.init(serverName)
   }
 
-  *update(serverName, weightBellAccu) {
-    //使用state来描述cabinet进行到哪一步, 下一步的动作是什么
-    if (this.state === "初始化") {
+  *updateCabinetInfo(serverName) {
+    if (this.state === "获取信息") {
       this.total = yield fetchDDE(
         serverName,
         this.config[this.outputNr]["total"].itemName,
@@ -334,31 +349,28 @@ class Cabinet {
 
       // 检查出柜频率
       yield this.checkOutputFreqSetting()
-      
-      
-    } else if (this.state === "监控") {
-      if(this.total - weightBellAccu < this.cabinetConig[this.outputNr].reference.diff) {
-        let halfEyeState = yield this.getHalfEyeState(this.serverName)
-        
-        if(halfEyeState === 1) {
-          logger.info(`${this.line} 加料出柜未转高速`)
-        }
-
-        this.state = "完成"
-      }
-    }
+    } 
   }
 
   *checkOutputFreqSetting() {
     // 
   }
 
-  *getHalfEyeState(serverName) {
-    return yield fetchDDE(
-      serverName, 
-      this.config[this.outputNr]["halfEye"].itemName,
-      this.config[this.outputNr]["halfEye"].valueType,
-    )
+  *checkHalfEyeState(serverName, weightBellAccu) {
+    if(this.state === "监控" && this.total - weightBellAccu < this.cabinetConig[this.outputNr].reference.diff) {
+      
+      let halfEyeState = yield fetchDDE(
+        serverName, 
+        this.config[this.outputNr]["halfEye"].itemName,
+        this.config[this.outputNr]["halfEye"].valueType,
+      )
+      
+      if(halfEyeState === 1) {
+        logger.info(`${this.line} 加料出柜未转高速`)
+      }
+
+      this.state = "完成"
+    }
   }
 }
 
