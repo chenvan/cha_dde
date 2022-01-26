@@ -1,31 +1,21 @@
-'use strict'
-
-const config = require("../mobx_test_config/AddFlavour.json")
-const { makeAutoObservable, action, reaction, override, autorun, runInAction } = require("mobx")
+const config = require("../mobx_test_config/AddWater.json")
+const { makeAutoObservable, action, reaction, autorun, runInAction } = require("mobx")
 const { setAdvise, fetchDDE } = require("../util/fetchDDE")
 const { logger } = require("../util/loggerHelper")
-const { speakTwice } = require("../util/speak")
-const Cabinet = require('./Cabinet')
-const WeightBell = require('./WeightBell')
-const { Device } = require('./Device')
+const WeightBell = require("./WeightBell")
+
 
 /*
-加料监控状态
+回潮
 
-准备: 加料批次发生转换
-参数检查完成: 
-监控 :电子秤进入运行状态
-停止: 秤状态为停止是
-
-一个电子秤, 
-一个出柜, 
-暂存柜两个电眼, 
-加料批号
+两个电子秤, 一个主电子秤, 一个薄片秤
+切片前一个电眼, 检测切片来料
+切片后一个电眼, 检测切片出口
+一个回潮筒批次号
 
 */
 
-class AddFlavour {
-  
+class AddWater {
   line
   serverName
   state
@@ -33,8 +23,8 @@ class AddFlavour {
   id
   deviceList = []
   mainWeightBell
-  cabinet
-
+  flakeWeightBell
+  
 
   constructor(line) {
     makeAutoObservable(this, {
@@ -48,31 +38,17 @@ class AddFlavour {
     this.updateCount = 0
     
     this.state = "停止"
-    this.mainWeightBell = new WeightBell(this.line, "主秤", config[line]["mainWeightBell"])
-    this.cabinet = new Cabinet(this.line, config[line]["cabinet"])
+    this.mainWeightBell = new WeightBell(this.line, "主秤", config[line]["weightBell"]["主秤"])
+    this.flakeWeightBell = new WeightBell(this.line, "薄片秤", config[line]["weightBell"]["薄片秤"])
 
-    reaction(
-      () => this.id,
-      id => {
-        if(this.state === "停止" && id) {
-          this.state = "准备"
-        }
-      }
-    )
-
-    autorun(() => {
-      console.log("addFlavour 加料")
-      console.log(this.state, this.id)
-      console.log("===========================")
-    })
   }
 
   async init() {
     // init advise
     await Promise.all([
       this.initAdviseData(config[this.line]["advise"]),
-      this.mainWeightBell.init(this.serverName),
-      this.cabinet.init(this.serverName)
+      this.mainWeighBell.init(this.serverName),
+      this.flakeWeightBell.init(this.serverName)
     ])
   }
 
@@ -80,6 +56,7 @@ class AddFlavour {
 
   }
 
+  // 弄一个公共函数
   async initAdviseData(adviseConfigMap) {
     for(const[key, value] of Object.entries(adviseConfigMap)) {
       logger.info(`init advise -> ${key}: ${value}`)
@@ -117,23 +94,15 @@ class AddFlavour {
     this.refreshUpdateCount()
 
     if(this.state === "准备") {
-      await this.cabinet.updateCabinetInfo(this.serverName)
-      await this.mainWeightBell.fetchSetting(this.serverName)
-
-      runInAction(() => {
-        if (this.cabinet.state === "监控") {
-          this.state = "准备完成"
-        }
-      })
-      // 检查参数
-      //
+      await this.mainWeighBell.fetchSetting(this.serverName)
+      await this.flakeWeightBell.fetchSetting(this.serverName)
 
     }else if(this.state === "准备完成" || this.state === "停止") {
 
-      await this.mainWeightBell.update(this.serverName)
+      await this.mainWeighBell.update(this.serverName)
 
       runInAction(() => {
-        if(this.mainWeightBell.state === "运行正常") {
+        if(this.mainWeighBell.state === "运行正常") {
           this.state = "监控"
         }
       })
@@ -142,13 +111,14 @@ class AddFlavour {
       // 检查 device 状态持续时间是否符合要求
       this.checkDeviceState()
 
-      // 先更新电子秤, 再检查半柜状态
-      await this.mainWeightBell.update(this.serverName)
+      await this.mainWeighBell.update(this.serverName)
 
-      await this.cabinet.checkHalfEyeState(this.serverName, this.mainWeightBell.accu)
+      if(this.flakeWeightBell.state !== "不运行") {
+        await this.flakeWeightBell.update(this.serverName)
+      }
 
       runInAction(() => {
-        if(this.mainWeightBell.state === "运行停止") {
+        if(this.mainWeighBell.state === "运行停止") {
           this.state = "停止"
         }
       })

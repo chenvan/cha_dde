@@ -1,0 +1,66 @@
+{
+  "六四回潮": {
+    "serverName": "VMGZZSHMI3",
+    "advise": {
+      "回潮批号": {
+        "itemName": "Galaxy:rHN_Z6.HN6.Z6_ZCBC_CurrBatchNo",
+        "type": "id"
+      },
+      "切片前输送带": {
+        "itemName": "Galaxy:ZY2KT.Topic_ZS6.FT_DP1_M1_STATE",
+        "type": "device",
+        "maxTime": 90,
+        "detectState": "33"
+      },
+      "切片出口电眼": {
+        "itemName": "Galaxy:ZY2KT.Topic_ZS6.FT_DP5_B1_1",
+        "type": "device",
+        "maxTime": 20,
+        "detectState": "0"
+      }
+    },
+    "weightBell": {
+      "主秤": {
+        "setting": {
+          "itemName": "Galaxy:rHN_Z6.HN6.Z6_ZCBC_DB1Value_1",
+          "valueType": "int"
+        },
+        "accu": {
+          "itemName": "Galaxy:rHN_Z6.HN6.Z6_ZCBC_DB1Value_3",
+          "valueType": "int"
+        },
+        "real": {
+          "itemName": "Galaxy:rHN_Z6.HN6.Z6_ZCBC_DB1Value_2",
+          "valueType": "int"
+        },
+        "electEye": {
+          "name":"秤前电眼",
+          "itemName": "Galaxy:ZY2KT.Topic_ZS6.FT_DP5_B1_2",
+          "type": "device",
+          "maxTime": 20,
+          "detectState": "0"
+        }
+      },
+      "薄片秤": {
+        "setting": {
+          "itemName": "Galaxy:ZY2_YPSpice_JK.Balance_YX227.FluxSP",
+          "valueType": "int"
+        },
+        "accu": {
+          "itemName": "Galaxy:ZY2_YPSpice_JK.Balance_YX227.Total",
+          "valueType": "int"
+        },
+        "real": {
+          "itemName": "Galaxy:ZY2_YPSpice_JK.Balance_YX227.Flux",
+          "valueType": "int"
+        },
+        "electEye": {
+          "name":"定量管高电眼",
+          "itemName": "Galaxy:ZY2_YPOutSilo_JK.Limit_YX226.High",
+          "type": "device",
+          "maxTime": 40
+        }
+      }
+    }
+  }
+}
