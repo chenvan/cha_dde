@@ -1,3 +1,5 @@
+'use strict'
+
 const { makeAutoObservable, action, reaction, override, autorun, runInAction } = require("mobx")
 const { fetchDDE } = require("../util/fetchDDE")
 const { logger } = require("../util/loggerHelper")
@@ -33,11 +35,11 @@ class WeightBell {
     this.weightBellConfig = weightBellConfig
     this.isTrigger = false
 
-    autorun(() => {
-      console.log("weight bell 电子秤")
-      console.log(this.state, this.setting, this.real, this.accu)
-      console.log("=============================")
-    })
+    // autorun(() => {
+    //   console.log("weight bell 电子秤")
+    //   console.log(this.state, this.setting, this.real, this.accu)
+    //   console.log("=============================")
+    // })
   }
 
   async init(serverName) {

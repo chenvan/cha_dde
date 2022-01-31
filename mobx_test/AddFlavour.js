@@ -60,11 +60,11 @@ class AddFlavour {
       }
     )
 
-    autorun(() => {
-      console.log("addFlavour 加料")
-      console.log(this.state, this.id)
-      console.log("===========================")
-    })
+    // autorun(() => {
+    //   console.log("addFlavour 加料")
+    //   console.log(this.state, this.id)
+    //   console.log("===========================")
+    // })
   }
 
   async init() {
@@ -165,3 +165,5 @@ class AddFlavour {
     if(this.updateCount > 60) this.updateCount = 1
   }
 }
+
+module.exports = AddFlavour

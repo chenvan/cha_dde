@@ -6,6 +6,10 @@
         "itemName": "Galaxy:rHN_Z6.HN6.Z6_ZCBC_CurrBatchNo",
         "type": "id"
       },
+      "除杂批号": {
+        "itemName": "Galaxy:ZY2_YPCylinder_JK.ProductUnit.Batch_Now",
+        "type": "id"
+      },
       "切片前输送带": {
         "itemName": "Galaxy:ZY2KT.Topic_ZS6.FT_DP1_M1_STATE",
         "type": "device",

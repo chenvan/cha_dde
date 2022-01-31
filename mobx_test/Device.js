@@ -1,8 +1,10 @@
-const { makeAutoObservable, action, reaction, override, autorun, runInAction } = require("mobx")
+'use strict'
+
+const { makeObservable, action, reaction, override, autorun, runInAction, observable } = require("mobx")
 const { setAdvise } = require("../util/fetchDDE")
 const { logger } = require("../util/loggerHelper")
 
-export class Device {
+class Device {
   line
   deviceName
   maxDuration
@@ -12,12 +14,17 @@ export class Device {
   isTrigger
 
   constructor(line, deviceName, maxDuration, itemName) {
-    makeAutoObservable(this, {
+    makeObservable(this, {
       deviceName: false,
       maxDuration: false,
       itemName: false,
       isTrigger: false,
-      line: false
+      line: false,
+      deviceState: observable,
+      lastUpdateMoment: false,
+      checkState:false,
+      init: false,
+      reConnect: false
     })
 
     this.line = line
@@ -54,7 +61,7 @@ export class Device {
   }
 }
 
-export class DeviceWithSpecifyState extends Device {
+class DeviceWithSpecifyState extends Device {
   specifyState
 
   constructor(line, deviceName, maxDuration, itemName, specifyState) {
@@ -62,7 +69,7 @@ export class DeviceWithSpecifyState extends Device {
     
     makeObservable(this, {
       specifyState: false,
-      checkState: override
+      checkState: false
     })
 
     this.specifyState = specifyState

@@ -1,0 +1,14 @@
+{
+  "Galaxy:ZY2_YPSpice_JK.ProductUnit.Batch_Now": "2201SSJD##001   ",
+  "Galaxy:ZY2_YPSpice_JK.Balance_YX227.FluxSP": 6800,
+  "Galaxy:ZY2_YPSpice_JK.Balance_YX227.Flux": 6800,
+  "Galaxy:ZY2_YPSpice_JK.ProductUnit.SLOut1_Now": 2103,
+  "Galaxy:ZY2_YPOutSilo_JK.CabinetOut_2103.CabInfo.InWeight": 6800,
+  "Galaxy:ZY2_YPOutSilo_JK.CabinetOut_2103.CabInfo.InMode": 100,
+  "Galaxy:ZY2_YPOutSilo_JK.CabinetOut_2103.CabOut.Bottom.HighFreq": 50,
+  "Galaxy:ZY2_YPOutSilo_JK.CabinetOut_2103.CabOut.Bottom.LowFreq": 25,
+  "Galaxy:rHN_Z6.HN6.Z6_ZCBC_CurrBatchNo": "2201SSJD##001   ",
+  "Galaxy:ZY2_YPCylinder_JK.ProductUnit.Batch_Now": "2201SSJD##001   ",
+  "Galaxy:rHN_Z6.HN6.Z6_ZCBC_DB1Value_1": 6400,
+  "Galaxy:rHN_Z6.HN6.Z6_ZCBC_DB1Value_2": 6400
+}

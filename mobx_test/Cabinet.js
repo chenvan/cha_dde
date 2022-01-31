@@ -1,3 +1,5 @@
+'use strict'
+
 const { makeAutoObservable, action, reaction, override, autorun, runInAction } = require("mobx")
 const { setAdvise, fetchDDE } = require("../util/fetchDDE")
 const { logger } = require("../util/loggerHelper")
@@ -6,7 +8,7 @@ const { logger } = require("../util/loggerHelper")
 Cabinet 监控柜的半柜电眼是否正常
 state: 获取信息 -> 监控 -> 完成
 */
-export class Cabinet {
+class Cabinet {
   line
   outputNr
   state
@@ -34,11 +36,11 @@ export class Cabinet {
       }
     )
 
-    autorun(() => {
-      console.log("cabinet 出柜")
-      console.log(this.state, this.total, this.outputNr)
-      console.log("===========================")
-    })
+    // autorun(() => {
+    //   console.log("cabinet 出柜")
+    //   console.log(this.state, this.total, this.outputNr)
+    //   console.log("===========================")
+    // })
   }
 
   async init(serverName) {

@@ -1,4 +1,5 @@
 const { NetDDEClient, Constants } = require('netdde')
+const fakeDataConfig = require("../mobx_test_config/test.json")
 
 const serverNameList = ["VMGZZSHMI3", "VMGZZSHMI6"]
 
@@ -83,13 +84,45 @@ async function connectServer(serverName) {
     })
 }
 
-async function disconnectAllClients( ) {
+async function disconnectAllClients() {
     for (let serverName in connectingServers)
        await connectingServers[serverName].disconnect()
 }
 
-module.exports = {
-    fetchDDE,
-    setAdvise,
-    disconnectAllClients
+async function fetchDDETest(serverName, itemName, returnType) {
+    if(fakeDataConfig.hasOwnProperty(itemName)) {
+        return fakeDataConfig[itemName]
+    } else {
+        if(returnType === "int"){
+            return 1000
+        } else {
+            return "test"
+        }
+    }
+}
+
+async function setAdviseTest(serverName, itemName, callback) {
+    if(fakeDataConfig.hasOwnProperty(itemName)) {
+        callback({data: fakeDataConfig[itemName]})
+    } else {
+        callback({data: "0"})
+    }
+}
+
+async function disconnectAllClientsTest() {
+    
+}
+
+if (process.env.NODE_ENV === 'test' || process.env.NODE_ENV === "dev") {
+    module.exports = {
+        fetchDDE: fetchDDETest,
+        setAdvise: setAdviseTest,
+        disconnectAllClients: disconnectAllClientsTest
+    }
+} else {
+    module.exports = {
+        fetchDDE,
+        setAdvise,
+        disconnectAllClients
+    }
 }
