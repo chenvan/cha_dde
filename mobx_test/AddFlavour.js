@@ -8,6 +8,7 @@ const { speakTwice } = require("../util/speak")
 const Cabinet = require('./Cabinet')
 const WeightBell = require('./WeightBell')
 const { Device } = require('./Device')
+const { genAddFlavourState } = require('./UI')
 
 /*
 加料监控状态
@@ -36,20 +37,24 @@ class AddFlavour {
   cabinet
 
 
-  constructor(line) {
+  constructor(line, container) {
     makeAutoObservable(this, {
       line: false,
+      container: false,
       serverName: false,
       updateCount: false
     })
   
     this.line = line
+    this.container = container
     this.serverName = config[line]["serverName"]
     this.updateCount = 0
     
     this.state = "停止"
     this.mainWeightBell = new WeightBell(this.line, "主秤", config[line]["mainWeightBell"])
     this.cabinet = new Cabinet(this.line, config[line]["cabinet"])
+
+    // build container children, or just use autorun?
 
     reaction(
       () => this.id,
@@ -60,11 +65,10 @@ class AddFlavour {
       }
     )
 
-    // autorun(() => {
-    //   console.log("addFlavour 加料")
-    //   console.log(this.state, this.id)
-    //   console.log("===========================")
-    // })
+    autorun(() => {
+      this.container.setContent(genAddFlavourState(this))
+      this.container.parent.render()
+    })
   }
 
   async init() {

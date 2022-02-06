@@ -6,7 +6,7 @@ const { setAdvise, fetchDDE } = require("../util/fetchDDE")
 const { logger } = require("../util/loggerHelper")
 const WeightBell = require("./WeightBell")
 const { Device, DeviceWithSpecifyState } = require('./Device')
-
+const { genAddWaterState } = require('./UI')
 /*
 回潮
 
@@ -27,14 +27,16 @@ class AddWater {
   mainWeightBell
   flakeWeightBell
 
-  constructor(line) {
+  constructor(line, container) {
     makeAutoObservable(this, {
       line: false,
+      container: false,
       serverName: false,
       updateCount: false
     })
   
     this.line = line
+    this.container = container
     this.serverName = config[line]["serverName"]
     this.updateCount = 0
     
@@ -62,6 +64,11 @@ class AddWater {
         } 
       }
     )
+
+    autorun(() => {
+      this.container.setContent(genAddWaterState(this))
+      this.container.parent.render()
+    })
 
   }
 

@@ -1,108 +1,39 @@
-const term = require("terminal-kit").terminal
-
-/*
-monDict:
-  {
-    "加料": [],
-    "回潮": []
-  }
-*/
-
-let _monDict
-
-function renderAddFlavour(addFlavour) {
-  term(`${addFlavour.line}状态: ${padLeft(10, addFlavour.state)}\n`)
-  renderWeigthBell("主秤", addFlavour.mainWeightBell)
-  renderCabinet(addFlavour.cabinet)
-
-  for (device of addFlavour.deviceList) {
-    renderDeviceState(device)
-  }
+function genWeigthBellState(name, weightBell) {
+  return `${name} ` + 
+    `状态: ${weightBell.state} 设定流量 / 实际流量 / 累计量: ${weightBell.setting} / ${weightBell.real} / ${weightBell.accu}\n` + 
+    genDeviceState(weightBell.electEye)
 }
 
-function renderAddWater(addWater) {
-  term(`${addWater.line}状态: ${padLeft(10, addWater.state)}\n`)
-  renderWeigthBell("主秤", addWater.mainWeightBell)
-  renderWeigthBell("薄片秤", addWater.flakeWeightBell)
-
-  for (device of addWater.deviceList) {
-    renderDeviceState(device)
-  }
+function genCabinetState(cabinet) {
+  return `出柜号: ${cabinet.outputNr % 100} 出柜状态: ${cabinet.state}\n`
 }
 
-function renderWeigthBell(name, weightBell) {
-  term(`${name}状态: ${padLeft(10,weightBell.state)}\n`)
-  term(`设定流量 / 实际流量 / 累计量: ${padLeft(20, addSlash([weightBell.setting, weightBell.real, weightBell.accu]))}\n`)
-  renderDeviceState(weightBell.electEye)
-}
-
-function renderCabinet(cabinet) {
-  term(`出柜状态: ${padLeft(10, cabinet.state)}\n`)
-  term(`出柜号: ${padLeft(10, cabinet.outputNr % 100)}\n`)
-}
-
-function renderDeviceState(device) {
-  let string
+function genDeviceState(device) {
+  let output = `运行状态 / 临界持续时间 / 持续时间: ${device.deviceState} / ${device.maxDuration} / ${(Date.now() - device.lastUpdateMoment) / 1000 }\n`
   
   if(device.specifyState !== undefined) {
-    string = `监控状态 / 运行状态 / 最大持续时间 / 持续时间: ${padLeft(30, addSlash([device.specifyState, device.deviceState, device.maxDuration, (Date.now() - device.lastUpdateMoment) / 1000 ]))}\n`
-  } else {
-    string = `运行状态 / 最大持续时间 / 持续时间: ${padLeft(25, addSlash([device.deviceState, device.maxDuration, (Date.now() - device.lastUpdateMoment) / 1000 ]))}\n`
+    output = `监控状态 / 运行状态 / 临界持续时间 / 持续时间: ${device.specifyState} / ${device.deviceState} / ${device.maxDuration} / ${(Date.now() - device.lastUpdateMoment) / 1000 }\n`
   }
 
-  term(device.deviceName + ": " + string)
+  return `${device.deviceName} ` + output
 }
 
-function init(monDict) {
-  _monDict = monDict
-  term.clear()
+function genAddFlavourState(addFlavour) {
+  return  `批号: ${addFlavour.id} 状态: ${addFlavour.state}\n` +
+    genCabinetState(addFlavour.cabinet) +
+    genWeigthBellState("主秤", addFlavour.mainWeightBell) + 
+    addFlavour.deviceList.map(device => genDeviceState(device)).join('')
 }
 
-function render() {
-  // term.moveTo(1, 1)
-  term.clear()
-  for (const [key, monList] of Object.entries(_monDict)) {
-    if (key === "回潮") {
-      monList.forEach(mon => renderAddWater(mon))
-    } else if (key === "加料") {
-      monList.forEach(mon => renderAddFlavour(mon))
-    }
-  }
+function genAddWaterState(addWater) {
+  return  `回潮批号: ${addWater.idMap['回潮批号']} 除杂批号: ${addWater.idMap['除杂批号']} 状态: ${addWater.state}\n` +
+    genWeigthBellState("主秤", addWater.mainWeightBell) + 
+    genWeigthBellState("薄片秤", addWater.flakeWeightBell) +
+    addWater.deviceList.map(device => genDeviceState(device)).join('')
 }
 
-
-// pad, padLeft, padRight
-function pad(pad, str, padLeft) {
-  if (typeof str === 'undefined') 
-    return pad;
-  if (padLeft) {
-    return (pad + str).slice(-pad.length);
-  } else {
-    return (str + pad).substring(0, pad.length);
-  }
-}
-
-function padLeft(padNum, str) {
-  return pad(Array(padNum).join(" "), str, true)
-}
-
-function padRigth(padNum, str){
-  return pad(Array(padNum).join(" "), str, false)
-}
-
-function addSlash(strList) {
-  let newStrList = strList.map(str => {
-    if (str === undefined) {
-      return padLeft(2, str)
-    } else {
-      return str
-    }
-  })
-
-  return newStrList.join(' / ')
-}
 
 module.exports = {
-  render,
-  init
+  genAddFlavourState,
+  genAddWaterState,
 }

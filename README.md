@@ -3,11 +3,11 @@
 
 DDE获取数据的方式是 fetch 和 set advice, 为了方便开发需要在 test 环境下返回假数据
 
-用这种手段获取数据并不稳定, View 二级界面的数据需要打开后才能被获取
+用 DDE 获取数据并不稳定, View 二级界面的数据需要打开后才能被获取
 
 ### 升级
 
-待中控升级了后, 看是否能够改用支持UA架构的Lib, 更改获取数据的方法
+待中控升级后, 看是否能够改用支持UA架构的Lib, 更改获取数据的方法
 
 # 监视逻辑
 
@@ -16,5 +16,6 @@ DDE获取数据的方式是 fetch 和 set advice, 为了方便开发需要在 te
 
 # UI显示
 
-使用 [Terminal Kit](https://github.com/cronvel/terminal-kit) 来展示UI
+使用 [blessed](https://github.com/chjj/blessed#windows-compatibility) 和 [blessed-contrib](https://github.com/yaronn/blessed-contrib) 来展示UI
 
+对于每一个监控单元传递一个box, 然后监控单元里, 往 box 里增加 text, 

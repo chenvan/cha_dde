@@ -34,93 +34,6 @@
 
 - 加香
 
-# 类(Class)
-
-## 监控单元
-
-监控单元下,各服务的运行频率不一致, 我们以10s为一个单位来控制各功能的更新检查频率
-
-### 加料单元
-
-利用"电子秤运行状态", "换批"来控制各功能的开始, 结束
-
-创建各种服务
-
-## 服务
-
-基于逻辑(如出柜监控)或性质(如电眼监控)创建的用于管理的类, 我们称之为服务.
-
-功能有自己的更新频率, 并由单元控制自己的运行
-
-### 出柜监控
-
-监控出柜号的更新, 出柜号出现更新, 即立刻更新出柜信息
-
-间隙获取电子秤的累计量, 但柜信息的重量与电子秤累计量的差值到达某个条件时, 查看该柜的半柜电眼的情况, 判断出柜是否成功转高速
-
-### 类提升带监控
-
-对于含有秤, 电眼控制, 进出料是先进先出方式的设备组可以看成是一组监控单元
-
-监控进出料的控制电眼(电子秤速度不一样, 可能需要调整电眼状态的持续时间)
-
-监控电子秤的状态
-
-电子秤假运行问题(监控定量管电眼)
-  
-是否包含主秤? 
-
-主秤主要是控制各"服务"是否运行
-
-### 电眼状态控制
-
-
-
-## 基础数据结构
-
-### RequestData
-
-轮询查询类型(request): 只关注发生变化, 对何时变化不关心
-
-- Common: 离散 -> 离散
-
-- TraceSetting: 模拟 -> 转换 -> 离散
-
-被间隙性调用 RequestData.updateAndJudgeChange 函数判断变化, 并根据变化做出相应应对
-
-### AdviseData
-
-主动告知(advise): 需要知道变化以及变化的时间, 如电眼某状态的持续时间
-
-- ElectEye
-
-
-# 程序运行过程
-
-## 主程序
-
-1. 创建所有控制单元
-
-2. 使用 setInterval 函数, 间隙运行各控制单元的 update 函数
-
-
-# 错误处理
-
-## Mon
-
-### updateTraceData 使用 catch error
-
-traceData 出问题不会让 isChange 变成 true 
-
-
-service init 出问题会让 init 不成功. 解决方法 service 使用 isInitSuceess 来跟踪 init 是否成功, 如果不成功会在 service update 中重新进行 init
-
-## updateService
-
-service update 出问题没有问题, 把变状态的语句放到 fetch 语句之后, 这样下一次 update 还能进行
-
-# 错误
-
 
 # 问题
 
@@ -143,7 +56,7 @@ service update 出问题没有问题, 把变状态的语句放到 fetch 语句�
 
 ### netdde 无法一直成功获取筒生产状态, 电子秤运行状态
 
-第一次 request 的时候是能获得值的, 但是后面就不行了, 知道值变化后才能获取.
+第一次 request 的时候是能获得值的, 但是后面就不行了, 直到值变化后才能获取.
 
 怀疑布尔量都不能一直间歇获取(未证实), 使用 advice 倒是可以获取
 
@@ -157,9 +70,12 @@ service update 出问题没有问题, 把变状态的语句放到 fetch 语句�
 
 ### advice 的初次数据获取不到
 
-修改 src\client\client.js 中 advise 函数, 把 reqVal 属性改为 true
+先后顺序的问题, 应该先设置 listener, 后设置 advice
 
 ### Device 中的 makeObservable 的设置不知到正确不
+
+### blessed, blessed-contrib 无法展示中文
+[解决方法](https://github.com/chjj/blessed/issues/377)
 
 
 
