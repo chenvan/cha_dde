@@ -66,6 +66,7 @@ class AddFlavour {
     )
 
     autorun(() => {
+      this.container.setLabel(`${this.line}(${this.state})`)
       this.container.setContent(genAddFlavourState(this))
       this.container.parent.render()
     })

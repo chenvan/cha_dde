@@ -5,7 +5,7 @@ const blessed = require('blessed')
 const contrib = require('blessed-contrib')
 
 const screen = blessed.screen({fullUnicode: true})
-var grid = new contrib.grid({rows: 3, cols: 2, screen: screen})
+var grid = new contrib.grid({rows: 2, cols: 2, screen: screen})
 
 // generate container
 let setting = {

@@ -66,6 +66,7 @@ class AddWater {
     )
 
     autorun(() => {
+      this.container.setLabel(`${this.line}(${this.state})`)
       this.container.setContent(genAddWaterState(this))
       this.container.parent.render()
     })
