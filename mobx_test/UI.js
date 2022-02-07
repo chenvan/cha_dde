@@ -1,6 +1,7 @@
 const { now } = require('mobx-utils')
 
 function genWeigthBellState(name, weightBell) {
+
   return `${name}(${weightBell.state}) ` + 
     `设定流量 / 实际流量 / 累计量: ${weightBell.setting} / ${weightBell.real} / ${weightBell.accu}\n` + 
     genDeviceState(weightBell.electEye)

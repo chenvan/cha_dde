@@ -66,6 +66,7 @@ class AddWater {
     )
 
     autorun(() => {
+      // 在 init 没有完成的时候, autorun 会自己先跑一次, 因此会出现一些 device 没有 init 完成的情况
       this.container.setLabel(`${this.line}(${this.state})`)
       this.container.setContent(genAddWaterState(this))
       this.container.parent.render()
