@@ -9,7 +9,7 @@ const { speakTwice } = require("../util/speak")
 const Cabinet = require('./Cabinet')
 const WeightBell = require('./WeightBell')
 const { Device } = require('./Device')
-const { genAddFlavourState } = require('./UI')
+const { updateAddFlavourState } = require('./UI')
 const { checkPara } = require('../util/checkParaUtil')
 const { loadVoiceTips, clearVoiceTips, setRunningVoiceTips, setReadyVoiceTips } = require('../util/voiceTipsUtil')
 
@@ -55,7 +55,8 @@ class AddFlavour {
       isSetRunningVoiceTips: false,
       isSetReadyVoiceTips: false,
       runningTimeoutList: false,
-      readyTimeoutList: false
+      readyTimeoutList: false,
+      brandName: false
     })
   
     this.line = line
@@ -78,14 +79,14 @@ class AddFlavour {
       id => {
         if(id) {
           this.state = "准备"
-          // this.isSetRunningVoiceTips = false
         }
       }
     )
 
     autorun(() => {
-      this.container.setLabel(`${this.line}(${this.state})`)
-      this.container.setContent(genAddFlavourState(this))
+      // this.container.setLabel(`${this.line}(${this.state})`)
+      // this.container.setContent(genAddFlavourState(this))
+      updateAddFlavourState(this)
       this.container.parent.render()
     })
   }
@@ -146,15 +147,13 @@ class AddFlavour {
           // 检查参数
           checkPara(this.line, this.serverName, config[this.line]["para"])
         ])
+
         // await this.cabinet.updateCabinetInfo(this.serverName)
         // await this.mainWeightBell.fetchSetting(this.serverName)
-
         // 检查参数
         // await checkPara(this.line, this.serverName, config[this.line]["para"])
 
         this.brandName = await fetchBrandName(this.serverName, config[this.line]["brandName"]["itemName"], config[this.line]["brandName"]["valueType"])
-
-        
 
         runInAction(() => {
           if (this.cabinet.state === "监控") {

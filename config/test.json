@@ -1,5 +1,6 @@
 {
   "Galaxy:ZY2_YPSpice_JK.ProductUnit.Batch_Now": "2201SSJD##001   ",
+  "Galaxy:ZY2_YPSpice_JK.ProductUnit.BrandName_Now": "双喜(经典)   ",
   "Galaxy:ZY2_YPSpice_JK.Balance_YX227.FluxSP": 6800,
   "Galaxy:ZY2_YPSpice_JK.Balance_YX227.Flux": 6800,
   "Galaxy:ZY2_YPSpice_JK.ProductUnit.SLOut1_Now": 2103,
@@ -9,6 +10,7 @@
   "Galaxy:ZY2_YPOutSilo_JK.CabinetOut_2103.CabOut.Bottom.LowFreq": 25,
   "Galaxy:rHN_Z6.HN6.Z6_ZCBC_CurrBatchNo": "2201SSJD##001   ",
   "Galaxy:ZY2_YPCylinder_JK.ProductUnit.Batch_Now": "2201SSJD##001   ",
+  "Galaxy:rHN_Z6.HN6.Z6_ZCBC_CurrRecName": "双喜(经典)   ",
   "Galaxy:rHN_Z6.HN6.Z6_ZCBC_DB1Value_1": 6400,
   "Galaxy:rHN_Z6.HN6.Z6_ZCBC_DB1Value_2": 6400,
   "Galaxy:ZY2_YPCylinder_JK.ZY2_NewPart.ZY2_BP.BPBalance207.FluxSP": 500,
