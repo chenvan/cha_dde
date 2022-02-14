@@ -25,7 +25,7 @@ VoiceTips的结构
 
 
 function loadVoiceTips(line, fileName) {
-    const voiceTipsConfig =  require(`../mobx_test_config/VoiceTips/${fileName}.json`)
+    const voiceTipsConfig =  require(`../config/VoiceTips/${fileName}.json`)
     return voiceTipsConfig[line]
 }
 

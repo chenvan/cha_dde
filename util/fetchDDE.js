@@ -1,5 +1,5 @@
 const { NetDDEClient, Constants } = require('netdde')
-const fakeDataConfig = require("../mobx_test_config/test.json")
+const fakeDataConfig = require("../config/test.json")
 const { logger } = require("../util/loggerHelper")
 
 const serverNameList = ["VMGZZSHMI3", "VMGZZSHMI6"]

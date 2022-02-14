@@ -1,6 +1,6 @@
 'use strict'
 
-const config = require("../mobx_test_config/AddFlavour.json")
+const config = require("../config/AddFlavour.json")
 const { makeAutoObservable, action, reaction, override, autorun, runInAction } = require("mobx")
 const { setAdvise } = require("../util/fetchDDE")
 const { fetchBrandName, testServerConnect } = require("../util/fetchUtil")

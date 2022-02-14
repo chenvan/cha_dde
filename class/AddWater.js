@@ -1,6 +1,6 @@
 'use strict'
 
-const config = require("../mobx_test_config/AddWater.json")
+const config = require("../config/AddWater.json")
 const { makeAutoObservable, action, reaction, autorun, runInAction, observable } = require("mobx")
 const { setAdvise } = require("../util/fetchDDE")
 const { fetchBrandName, testServerConnect } = require("../util/fetchUtil")

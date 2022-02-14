@@ -1,5 +1,5 @@
-const AddFlavour = require('./mobx_test/AddFlavour')
-const AddWater = require('./mobx_test/AddWater')
+const AddFlavour = require('./class/AddFlavour')
+const AddWater = require('./class/AddWater')
 const blessed = require('blessed')
 const contrib = require('blessed-contrib')
 
