@@ -13,10 +13,9 @@
   "dependencies": {
     "blessed": "^0.1.81",
     "blessed-contrib": "^4.10.1",
-    "iconv-lite": "^0.6.3",
     "mobx": "^6.3.12",
     "mobx-utils": "^6.0.4",
-    "netdde": "^1.0.2",
+    "netdde": "git+https://github.com/chenvan/netdde",
     "winax": "^3.3.2",
     "winston": "^3.3.3"
   }
