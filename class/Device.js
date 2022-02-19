@@ -13,6 +13,7 @@ class Device {
   deviceState
   lastUpdateMoment
   isTrigger
+  duration
 
   constructor(line, deviceName, maxDuration, itemName) {
     makeObservable(this, {
@@ -25,7 +26,8 @@ class Device {
       lastUpdateMoment: false,
       checkState:false,
       init: false,
-      reConnect: false
+      reConnect: false,
+      duration: false
     })
 
     this.line = line
@@ -33,6 +35,7 @@ class Device {
     this.maxDuration = maxDuration
     this.itemName = itemName
     this.isTrigger = false
+    this.duration = 0
   }
 
   async init(serverName) {
@@ -50,13 +53,12 @@ class Device {
   // }
 
   checkState(now) {
-    let duration = (now - this.lastUpdateMoment) / 1000
-    // logger.info(`${this.line} ${this.deviceName}. 状态${this.deviceState}. 持续时间${duration}`)
-    if(duration > this.maxDuration && !this.isTrigger) {
+    this.duration = (now - this.lastUpdateMoment) / 1000
+    if(this.duration > this.maxDuration && !this.isTrigger) {
       logger.error(`${this.line} ${this.deviceName} 状态长时间不变.`)
       speakTwice(`${this.line} ${this.deviceName} 状态长时间不变.`)
       this.isTrigger = true
-    } else if(duration <= this.maxDuration) {
+    } else if(this.duration <= this.maxDuration) {
       this.isTrigger = false
     }
   }

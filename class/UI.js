@@ -16,15 +16,14 @@ function genCabinetState(cabinet) {
 function genDeviceState(device) {
 
   let output = `${device.deviceName}`
-  let interval = (now() - device.lastUpdateMoment) / 1000
-  let symbol = device.maxDuration >= interval ? ">=" : "<"
+  let symbol = device.maxDuration >= device.duration ? ">=" : "<"
   let isRed = symbol === "<" && ( device.specifyState === undefined || (device.specifyState !== undefined && device.specifyState === device.deviceState))
 
   if(device.specifyState !== undefined) {
     output += `(${device.specifyState} ${device.deviceState}) `
-    output += device.specifyState === device.deviceState ? `${device.maxDuration} ${symbol} ${interval}\n` : `\n`
+    output += device.specifyState === device.deviceState ? `${device.maxDuration} ${symbol} ${device.duration}\n` : `\n`
   } else {
-    output += `(${device.deviceState}) ${device.maxDuration} ${symbol} ${interval}\n` 
+    output += `(${device.deviceState}) ${device.maxDuration} ${symbol} ${device.duration}\n` 
   }
 
   return isRed? "{red-fg}" + output + "{/}" : output
